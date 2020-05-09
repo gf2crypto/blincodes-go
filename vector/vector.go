@@ -209,7 +209,7 @@ func (v *Vector) Not() *Vector {
         v.body[i] = ^b
     }
     if v.lenLast != 0 {
-        v.body[len(v.body)-1] &= (((1 << v.lenLast) - 1) << (wordSize - v.lenLast - 1))
+        v.body[len(v.body)-1] &= (((1 << v.lenLast) - 1) << (wordSize - v.lenLast))
     }
     return v
 }
