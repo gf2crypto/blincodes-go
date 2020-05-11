@@ -9,7 +9,7 @@ func TestNilXorNil(t *testing.T) {
     var w Vector
     v := New(nil)
     v.Xor(&w)
-    if v.Len() != 0 {
+    if !v.Equal(&w) {
         t.Errorf("vector testing: nil XOR nil is incorrect, nil XOR nil != nil, but %v",
             v)
     }
@@ -20,7 +20,7 @@ func TestNilXorEmpty(t *testing.T) {
     w := New([]uint8{})
     v := New(nil)
     v.Xor(w)
-    if v.Len() != 0 {
+    if !v.Equal(w) {
         t.Errorf("vector testing: nil XOR empty is incorrect, nil XOR empty != nil, but %v",
             v)
     }
@@ -31,7 +31,7 @@ func TestEmptyXorNil(t *testing.T) {
     v := New([]uint8{})
     w := New(nil)
     v.Xor(w)
-    if v.Len() != 0 {
+    if !v.Equal(w) {
         t.Errorf("vector testing: empty XOR nil is incorrect, empty XOR nil != nil, but %v",
             v)
     }
@@ -56,11 +56,7 @@ func TestXorLess64(t *testing.T) {
         1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
     })
     v.Xor(w)
-    if v.Len() != 32 {
-        t.Errorf("vector testing: XOR is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: XOR is incorrect, %v XOR %v = %v != %v",
             u, w, v, res)
     }
@@ -93,11 +89,7 @@ func TestXor64(t *testing.T) {
         1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,
     })
     v.Xor(w)
-    if v.Len() != 64 {
-        t.Errorf("vector testing: XOR is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: XOR is incorrect, %v XOR %v = %v != %v",
             u, w, v, res)
     }
@@ -138,11 +130,7 @@ func TestXorMore64(t *testing.T) {
         0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     })
     v.Xor(w)
-    if v.Len() != 93 {
-        t.Errorf("vector testing: XOR is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] && res.body[0] != res.body[1] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: XOR is incorrect, %v XOR %v = %v != %v",
             u, w, v, res)
     }
