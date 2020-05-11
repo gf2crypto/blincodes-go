@@ -9,7 +9,7 @@ func TestNilOrNil(t *testing.T) {
     var w Vector
     v := New(nil)
     v.Or(&w)
-    if v.Len() != 0 {
+    if !v.Equal(&w) {
         t.Errorf("vector testing: nil Or nil is incorrect, nil Or nil != nil, but %v",
             v)
     }
@@ -20,7 +20,7 @@ func TestNilOrEmpty(t *testing.T) {
     w := New([]uint8{})
     v := New(nil)
     v.Or(w)
-    if v.Len() != 0 {
+    if !v.Equal(w) {
         t.Errorf("vector testing: nil Or empty is incorrect, nil Or empty != nil, but %v",
             v)
     }
@@ -31,7 +31,7 @@ func TestEmptyOrNil(t *testing.T) {
     v := New([]uint8{})
     w := New(nil)
     v.Or(w)
-    if v.Len() != 0 {
+    if !v.Equal(w) {
         t.Errorf("vector testing: empty Or nil is incorrect, empty Or nil != nil, but %v",
             v)
     }
@@ -56,11 +56,7 @@ func TestOrLess64(t *testing.T) {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
     v.Or(w)
-    if v.Len() != 32 {
-        t.Errorf("vector testing: Or is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: Or is incorrect, %v Or %v = %v != %v",
             u, w, v, res)
     }
@@ -93,11 +89,7 @@ func TestOr64(t *testing.T) {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
     v.Or(w)
-    if v.Len() != 64 {
-        t.Errorf("vector testing: Or is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: Or is incorrect, %v Or %v = %v != %v",
             u, w, v, res)
     }
@@ -138,11 +130,7 @@ func TestOrMore64(t *testing.T) {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
     v.Or(w)
-    if v.Len() != 93 {
-        t.Errorf("vector testing: Or is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] && res.body[0] != res.body[1] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: Or is incorrect, %v Or %v = %v != %v",
             u, w, v, res)
     }
