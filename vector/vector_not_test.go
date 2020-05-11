@@ -8,7 +8,7 @@ import (
 func TestNotNil(t *testing.T) {
     v := New(nil)
     v.Not()
-    if v.Len() != 0 {
+    if !v.Equal(New(nil)) {
         t.Errorf("vector testing: NOT nil is incorrect, NOT nil != nil, but %v",
             v)
     }
@@ -18,7 +18,7 @@ func TestNotNil(t *testing.T) {
 func TestNotEmpty(t *testing.T) {
     v := New([]uint8{})
     v.Not()
-    if v.Len() != 0 {
+    if !v.Equal(New(nil)) {
         t.Errorf("vector testing: Not empty is incorrect, Not empty != nil, but %v",
             v)
     }
@@ -39,11 +39,7 @@ func TestNotLess64(t *testing.T) {
         1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
     })
     v.Not()
-    if v.Len() != 32 {
-        t.Errorf("vector testing: Not is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: Not is incorrect, Not %v = %v != %v",
             u, v, res)
     }
@@ -70,11 +66,7 @@ func TestNot64(t *testing.T) {
         1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,
     })
     v.Not()
-    if v.Len() != 64 {
-        t.Errorf("vector testing: Not is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: Not is incorrect, Not %v = %v != %v",
             u, v, res)
     }
@@ -107,11 +99,7 @@ func TestNotMore64(t *testing.T) {
         1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     })
     v.Not()
-    if v.Len() != 93 {
-        t.Errorf("vector testing: Not is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] && res.body[0] != res.body[1] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: Not is incorrect, Not %v = %v != %v",
             u, v, res)
     }
