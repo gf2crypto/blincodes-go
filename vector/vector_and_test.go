@@ -9,7 +9,7 @@ func TestNilAndNil(t *testing.T) {
     var w Vector
     v := New(nil)
     v.And(&w)
-    if v.Len() != 0 {
+    if !v.Equal(&w) {
         t.Errorf("vector testing: nil AND nil is incorrect, nil AND nil != nil, but %v",
             v)
     }
@@ -20,7 +20,7 @@ func TestNilAndEmpty(t *testing.T) {
     w := New([]uint8{})
     v := New(nil)
     v.And(w)
-    if v.Len() != 0 {
+    if !v.Equal(w) {
         t.Errorf("vector testing: nil And empty is incorrect, nil And empty != nil, but %v",
             v)
     }
@@ -31,7 +31,7 @@ func TestEmptyAndNil(t *testing.T) {
     v := New([]uint8{})
     w := New(nil)
     v.And(w)
-    if v.Len() != 0 {
+    if !v.Equal(w) {
         t.Errorf("vector testing: empty And nil is incorrect, empty And nil != nil, but %v",
             v)
     }
@@ -56,11 +56,7 @@ func TestAndLess64(t *testing.T) {
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
     v.And(w)
-    if v.Len() != 32 {
-        t.Errorf("vector testing: And is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: And is incorrect, %v And %v = %v != %v",
             u, w, v, res)
     }
@@ -93,11 +89,7 @@ func TestAnd64(t *testing.T) {
         0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
     })
     v.And(w)
-    if v.Len() != 64 {
-        t.Errorf("vector testing: And is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: And is incorrect, %v And %v = %v != %v",
             u, w, v, res)
     }
@@ -138,11 +130,7 @@ func TestAndMore64(t *testing.T) {
         1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
     v.And(w)
-    if v.Len() != 93 {
-        t.Errorf("vector testing: And is incorrect, length of result != 32 (%d != 32)",
-            v.Len())
-    }
-    if v.body[0] != res.body[0] && res.body[0] != res.body[1] {
+    if !v.Equal(res) {
         t.Errorf("vector testing: And is incorrect, %v And %v = %v != %v",
             u, w, v, res)
     }
