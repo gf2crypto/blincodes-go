@@ -7,7 +7,7 @@ import (
 //TestNilConcatenateNil tests function Concatenate of two nil vectors
 func TestNilConcatenateNil(t *testing.T) {
     var w Vector
-    v := New(nil)
+    v, _ := New(nil)
     v.Concatenate(&w)
     if !v.Equal(&w) {
         t.Errorf("vector testing: nil.Concatenate(nil) is incorrect, nil.Concatenate(nil) != nil, but %v",
@@ -17,8 +17,8 @@ func TestNilConcatenateNil(t *testing.T) {
 
 //TestNilConcatenateEmpty tests function Concatenate of nil vector and empty vector
 func TestNilConcatenateEmpty(t *testing.T) {
-    v := New([]uint8{})
-    w := New(nil)
+    v, _ := New([]uint8{})
+    w, _ := New(nil)
     v.Concatenate(w)
     if !v.Equal(w) {
         t.Errorf("vector testing: empty.Concatenate(nil) is incorrect, empty.Concatenate(nil) != nil, but %v",
@@ -28,10 +28,13 @@ func TestNilConcatenateEmpty(t *testing.T) {
 
 //TestEmptyConcatenateLen1 tests function Concatenate of empty vector and vector of length 1
 func TestEmptyConcatenateLen1(t *testing.T) {
-    v := New(nil)
-    v.Concatenate(New([]uint8{0}))
-    v.Concatenate(New([]uint8{1}))
-    if !v.Equal(New([]uint8{0, 1})) {
+    v, _ := New(nil)
+    v0, _ := New([]uint8{0})
+    v1, _ := New([]uint8{1})
+    res, _ := New([]uint8{0, 1})
+    v.Concatenate(v0)
+    v.Concatenate(v1)
+    if !v.Equal(res) {
         t.Errorf("vector testing: empty.Concatenate([0], [1]) is incorrect, is %v, but expected 01",
             v)
     }
@@ -39,15 +42,15 @@ func TestEmptyConcatenateLen1(t *testing.T) {
 
 //TestConcatenateLess64 tests function Concatenate for vectors of length less than 64
 func TestConcatenateLess64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0,
     })
-    w := New([]uint8{
+    w, _ := New([]uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
     })
-    res := New([]uint8{
+    res, _ := New([]uint8{
         0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -62,15 +65,15 @@ func TestConcatenateLess64(t *testing.T) {
 
 //TestConcatenate64 tests function Concatenate for vectors of length 64
 func TestConcatenate64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0,
     })
-    w := New([]uint8{
+    w, _ := New([]uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
     })
-    res := New([]uint8{
+    res, _ := New([]uint8{
         0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -85,7 +88,7 @@ func TestConcatenate64(t *testing.T) {
 
 //TestConcatenateMore64 tests function Concatenate for vectors of length more than 64
 func TestConcatenateMore64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -93,7 +96,7 @@ func TestConcatenateMore64(t *testing.T) {
         0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
-    w := New([]uint8{
+    w, _ := New([]uint8{
         0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
         0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
@@ -101,7 +104,7 @@ func TestConcatenateMore64(t *testing.T) {
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
-    res := New([]uint8{
+    res, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,

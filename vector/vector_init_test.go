@@ -4,7 +4,7 @@ import "testing"
 
 //TestNewNil tests function New(nil)
 func TestNewNil(t *testing.T) {
-    v := New(nil)
+    v, _ := New(nil)
     if len(v.body) != 0 {
         t.Errorf("vector testing: default init is incorrect, len(body) != 0 (%d != 0)", len(v.body))
     }
@@ -15,7 +15,7 @@ func TestNewNil(t *testing.T) {
 
 //TestNewEmpty tests function New([]uint8{})
 func TestNewEmpty(t *testing.T) {
-    v := New([]uint8{})
+    v, _ := New([]uint8{})
     if len(v.body) != 0 {
         t.Errorf("vector testing: default init is incorrect, len(body) != 0 (%d != 0)", len(v.body))
     }
@@ -26,7 +26,7 @@ func TestNewEmpty(t *testing.T) {
 
 //TestNewLen1 tests function New([]uint8{0})
 func TestNewLen1(t *testing.T) {
-    v := New([]uint8{0})
+    v, _ := New([]uint8{0})
     if len(v.body) != 1 {
         t.Errorf("vector testing: init by 0 is incorrect, len(body) != 1 (%d != 1)", len(v.body))
     }
@@ -37,7 +37,7 @@ func TestNewLen1(t *testing.T) {
 
 //TestNewLenLess64 tests function New(array of length less than 64)
 func TestNewLenLess64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
@@ -54,7 +54,7 @@ func TestNewLenLess64(t *testing.T) {
 
 //TestNewLenEqual64 tests function New(array of length 64)
 func TestNewLenEqual64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -73,7 +73,7 @@ func TestNewLenEqual64(t *testing.T) {
 
 //TestNewLenMore64 tests function New(array of length more than 64)
 func TestNewLenMore64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,

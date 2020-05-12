@@ -7,7 +7,7 @@ import (
 
 //TestStringNil tests function String for nil vector
 func TestStringNil(t *testing.T) {
-    v := New(nil)
+    v, _ := New(nil)
     if fmt.Sprint(v) != "" {
         t.Errorf("vector testing: String() is incorrect, str(nil) != \"\" (%s != \"\")",
             fmt.Sprint(v))
@@ -16,7 +16,7 @@ func TestStringNil(t *testing.T) {
 
 //TestStringEmpty tests function String for empty vector
 func TestStringEmpty(t *testing.T) {
-    v := New([]uint8{})
+    v, _ := New([]uint8{})
     if fmt.Sprint(v) != "" {
         t.Errorf("vector testing: String() is incorrect, str([]uint8{}) != \"\" (%s != \"\")",
             fmt.Sprint(v))
@@ -25,7 +25,7 @@ func TestStringEmpty(t *testing.T) {
 
 //TestStringLen1 tests function String for vector of length 1
 func TestStringLen1(t *testing.T) {
-    v := New([]uint8{0})
+    v, _ := New([]uint8{0})
     if fmt.Sprint(v) != "0" {
         t.Errorf("vector testing: String() is incorrect, str([]uint8{0}) != \"\" (%s != \"\")",
             fmt.Sprint(v))
@@ -34,7 +34,7 @@ func TestStringLen1(t *testing.T) {
 
 //TestStringLenLess64 tests function String for vector of length less than 64
 func TestStringLenLess64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
@@ -46,7 +46,7 @@ func TestStringLenLess64(t *testing.T) {
 
 //TestStringLen64 tests function String for vector of length 64
 func TestStringLen64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -60,7 +60,7 @@ func TestStringLen64(t *testing.T) {
 
 //TestStringLenMore64 tests function String for vector of length more than 64
 func TestStringLenMore64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,

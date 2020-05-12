@@ -6,7 +6,7 @@ import (
 
 //TestLenNil tests function Len for nil vector
 func TestLenNil(t *testing.T) {
-    v := New(nil)
+    v, _ := New(nil)
     if v.Len() != 0 {
         t.Errorf("vector testing: Len() is incorrect, nil.Len() != 0 (%d != 0)",
             v.Len())
@@ -15,7 +15,7 @@ func TestLenNil(t *testing.T) {
 
 //TestLenEmpty tests function Len for empty vector
 func TestLenEmpty(t *testing.T) {
-    v := New([]uint8{})
+    v, _ := New([]uint8{})
     if v.Len() != 0 {
         t.Errorf("vector testing: Len() is incorrect, []uint8{}.Len() != 0 (%d != 0)",
             v.Len())
@@ -24,7 +24,7 @@ func TestLenEmpty(t *testing.T) {
 
 //TestLenLen1 tests function Len for vector of length 1
 func TestLenLen1(t *testing.T) {
-    v := New([]uint8{0})
+    v, _ := New([]uint8{0})
     if v.Len() != 1 {
         t.Errorf("vector testing: Len() is incorrect, []uint8{0}.Len() != 1 (%d != 1)",
             v.Len())
@@ -33,7 +33,7 @@ func TestLenLen1(t *testing.T) {
 
 //TestLenLenLess64 tests function Len for vector of length less than 64
 func TestLenLenLess64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
@@ -45,7 +45,7 @@ func TestLenLenLess64(t *testing.T) {
 
 //TestLenLen64 tests function Len for vector of length 64
 func TestLenLen64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -59,7 +59,7 @@ func TestLenLen64(t *testing.T) {
 
 //TestLenLenMore64 tests function Len for vector of length more than 64
 func TestLenLenMore64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -75,7 +75,7 @@ func TestLenLenMore64(t *testing.T) {
 
 //TestSupportNil tests function Support for nil vector
 func TestSupportNil(t *testing.T) {
-    v := New(nil)
+    v, _ := New(nil)
     if len(v.Support()) != 0 {
         t.Errorf("vector testing: Support() is incorrect, nil.Support() != [] (%v != [])",
             v.Support())
@@ -84,7 +84,7 @@ func TestSupportNil(t *testing.T) {
 
 //TestSupportEmpty tests function Support for empty vector
 func TestSupportEmpty(t *testing.T) {
-    v := New([]uint8{})
+    v, _ := New([]uint8{})
     if len(v.Support()) != 0 {
         t.Errorf("vector testing: Support() is incorrect, []uint8{}.Support() != [] (%v != [])",
             v.Support())
@@ -93,12 +93,12 @@ func TestSupportEmpty(t *testing.T) {
 
 //TestSupportLen1 tests function Support for vector of length 1
 func TestSupportLen1(t *testing.T) {
-    v := New([]uint8{0})
+    v, _ := New([]uint8{0})
     if len(v.Support()) != 0 {
         t.Errorf("vector testing: Support() is incorrect, []uint8{0}.Support() != [] (%v != [])",
             v.Support())
     }
-    v = New([]uint8{1})
+    v, _ = New([]uint8{1})
     sup := v.Support()
     if len(sup) != 1 && sup[0] != 0 {
         t.Errorf("vector testing: Support() is incorrect, []uint8{1}.Support() != [0] (%v != [0])",
@@ -108,7 +108,7 @@ func TestSupportLen1(t *testing.T) {
 
 //TestSuppLenLess64 tests function Support for vector of length less than 64
 func TestSuppLenLess64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
@@ -128,7 +128,7 @@ func TestSuppLenLess64(t *testing.T) {
 
 //TestSuppLen64 tests function Support for vector of length 64
 func TestSuppLen64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -154,7 +154,7 @@ func TestSuppLen64(t *testing.T) {
 
 //TestSuppLenMore64 tests function Support for vector of length more than 64
 func TestSuppLenMore64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -186,7 +186,7 @@ func TestSuppLenMore64(t *testing.T) {
 
 //TestZeroesNil tests function Zeroes for nil vector
 func TestZeroesNil(t *testing.T) {
-    v := New(nil)
+    v, _ := New(nil)
     if len(v.Zeroes()) != 0 {
         t.Errorf("vector testing: Zeroes() is incorrect, nil.Zeroes() != [] (%v != [])",
             v.Zeroes())
@@ -195,7 +195,7 @@ func TestZeroesNil(t *testing.T) {
 
 //TestZeroesEmpty tests function Zeroes for empty vector
 func TestZeroesEmpty(t *testing.T) {
-    v := New([]uint8{})
+    v, _ := New([]uint8{})
     if len(v.Zeroes()) != 0 {
         t.Errorf("vector testing: Zeroes() is incorrect, []uint8{}.Zeroes() != [] (%v != [])",
             v.Zeroes())
@@ -204,12 +204,12 @@ func TestZeroesEmpty(t *testing.T) {
 
 //TestZeroesLen1 tests function Zeroes for vector of length 1
 func TestZeroesLen1(t *testing.T) {
-    v := New([]uint8{1})
+    v, _ := New([]uint8{1})
     if len(v.Zeroes()) != 0 {
         t.Errorf("vector testing: Zeroes() is incorrect, []uint8{1}.Zeroes() != [] (%v != [])",
             v.Zeroes())
     }
-    v = New([]uint8{0})
+    v, _ = New([]uint8{0})
     sup := v.Zeroes()
     if len(sup) != 1 && sup[0] != 0 {
         t.Errorf("vector testing: Zeroes() is incorrect, []uint8{0}.Zeroes() != [0] (%v != [0])",
@@ -219,7 +219,7 @@ func TestZeroesLen1(t *testing.T) {
 
 //TestZeroesLenLess64 tests function Zeroes for vector of length less than 64
 func TestZeroesLenLess64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
@@ -239,7 +239,7 @@ func TestZeroesLenLess64(t *testing.T) {
 
 //TestZeroesLen64 tests function Zeroes for vector of length 64
 func TestZeroesLen64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -264,7 +264,7 @@ func TestZeroesLen64(t *testing.T) {
 
 //TestZeroesLenMore64 tests function Zeroes for vector of length more than 64
 func TestZeroesLenMore64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -294,7 +294,7 @@ func TestZeroesLenMore64(t *testing.T) {
 
 //TestWtNil tests function Wt for nil vector
 func TestWtNil(t *testing.T) {
-    v := New(nil)
+    v, _ := New(nil)
     if v.Wt() != 0 {
         t.Errorf("vector testing: Wt() is incorrect, nil.Wt() != 0 (%d != 0)",
             v.Wt())
@@ -303,7 +303,7 @@ func TestWtNil(t *testing.T) {
 
 //TestWtEmpty tests function Wt for empty vector
 func TestWtEmpty(t *testing.T) {
-    v := New([]uint8{})
+    v, _ := New([]uint8{})
     if v.Wt() != 0 {
         t.Errorf("vector testing: Wt() is incorrect, []uint8{}.Wt() != 0 (%d != 0)",
             v.Wt())
@@ -312,7 +312,7 @@ func TestWtEmpty(t *testing.T) {
 
 //TestWtLen1 tests function Wt for vector of length 1
 func TestWtLen1(t *testing.T) {
-    v := New([]uint8{0})
+    v, _ := New([]uint8{0})
     if v.Wt() != 0 {
         t.Errorf("vector testing: Wt() is incorrect, []uint8{0}.Wt() != 0 (%d != 0)",
             v.Wt())
@@ -321,7 +321,7 @@ func TestWtLen1(t *testing.T) {
 
 //TestWtLenLess64 tests function Wt for vector of length less than 64
 func TestWtLenLess64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
@@ -333,7 +333,7 @@ func TestWtLenLess64(t *testing.T) {
 
 //TestWtLen64 tests function Wt for vector of length 64
 func TestWtLen64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -347,7 +347,7 @@ func TestWtLen64(t *testing.T) {
 
 //TestWtLenMore64 tests function Wt for vector of length more than 64
 func TestWtLenMore64(t *testing.T) {
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,

@@ -15,28 +15,6 @@ type Vector struct {
     lenLast int      //len of the last element of body array
 }
 
-// New creates vector object
-func New(body []uint8) *Vector {
-    if body == nil {
-        return &Vector{body: make([]uint64, 0, 0), lenLast: 0}
-    }
-    s := int(len(body) / wordSize)
-    lenLast := len(body) % wordSize
-    if lenLast != 0 {
-        s++
-    }
-    v := Vector{
-        body:    make([]uint64, s),
-        lenLast: lenLast,
-    }
-    for i, bit := range body {
-        if bit != 0 {
-            v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
-        }
-    }
-    return &v
-}
-
 func (v *Vector) String() string {
     var buf bytes.Buffer
     fs := fmt.Sprintf("%%0%db", wordSize)

@@ -9,7 +9,7 @@ import "bytes"
 //TestGetLen1 tests function Get for vector of length 1
 func TestGetLen1(t *testing.T) {
     var buf bytes.Buffer
-    v := New([]uint8{0})
+    v, _ := New([]uint8{0})
     for i := 0; i < v.Len(); i++ {
         fmt.Fprintf(&buf, "%v", v.Get(i))
     }
@@ -22,7 +22,7 @@ func TestGetLen1(t *testing.T) {
 //TestGetLenLess64 tests function Get for vector of length less than 64
 func TestGetLenLess64(t *testing.T) {
     var buf bytes.Buffer
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
@@ -39,7 +39,7 @@ func TestGetLenLess64(t *testing.T) {
 //TestGetLen64 tests function Get for vector of length 64
 func TestGetLen64(t *testing.T) {
     var buf bytes.Buffer
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -58,7 +58,7 @@ func TestGetLen64(t *testing.T) {
 //TestGetLenMore64 tests function Get for vector of length more than 64
 func TestGetLenMore64(t *testing.T) {
     var buf bytes.Buffer
-    v := New([]uint8{
+    v, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -78,7 +78,7 @@ func TestGetLenMore64(t *testing.T) {
 
 //TestBitsNil tests function Bits for nil vector
 func TestBitsNil(t *testing.T) {
-    v := New(nil)
+    v, _ := New(nil)
     if len(v.Bits()) != 0 {
         t.Errorf("vector testing: nil.Bits() is incorrect, %v",
             v.Bits())
@@ -87,7 +87,7 @@ func TestBitsNil(t *testing.T) {
 
 //TestBitsEmpty tests function Bits for empty vector
 func TestBitsEmpty(t *testing.T) {
-    v := New([]uint8{})
+    v, _ := New([]uint8{})
     if len(v.Bits()) != 0 {
         t.Errorf("vector testing: []uint8{}.Bits() is incorrect, %v",
             v.Bits())
@@ -97,7 +97,7 @@ func TestBitsEmpty(t *testing.T) {
 //TestBitsLen1 tests function Bits for vector of length 1
 func TestBitsLen1(t *testing.T) {
     vnil := []uint8{0}
-    v := New(vnil)
+    v, _ := New(vnil)
     for i, b := range v.Bits() {
         if vnil[i] != b {
             t.Errorf("vector testing: []uint8{}.Bits() is incorrect, (vnil[%d] = %d) != %d",
@@ -112,7 +112,7 @@ func TestBitsLenLess64(t *testing.T) {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     }
-    v := New(v1)
+    v, _ := New(v1)
     for i, b := range v.Bits() {
         if v1[i] != b {
             t.Errorf("vector testing: v1.Bits() is incorrect, (v1[%d] = %d) != %d",
@@ -129,7 +129,7 @@ func TestBitsLen64(t *testing.T) {
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
         0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
     }
-    v := New(v2)
+    v, _ := New(v2)
     for i, b := range v.Bits() {
         if v2[i] != b {
             t.Errorf("vector testing: v2.Bits() is incorrect, (v2[%d] = %d) != %d",
@@ -148,7 +148,7 @@ func TestBitsLenMore64(t *testing.T) {
         0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     }
-    v := New(v3)
+    v, _ := New(v3)
     for i, b := range v.Bits() {
         if v3[i] != b {
             t.Errorf("vector testing: v3.Bits() is incorrect, (v3[%d] = %d) != %d",
@@ -160,7 +160,7 @@ func TestBitsLenMore64(t *testing.T) {
 //TestSetLen1 tests function Set for vector of length 1
 func TestSetLen1(t *testing.T) {
     s := []uint8{0}
-    v := New(s)
+    v, _ := New(s)
     not := []uint8{1}
     for i, b := range v.Bits() {
         v.Set(i, b)
@@ -188,7 +188,7 @@ func TestSetLenLess64(t *testing.T) {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     }
-    v := New(s)
+    v, _ := New(s)
     not := []uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -221,7 +221,7 @@ func TestSetLen64(t *testing.T) {
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
         0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
     }
-    v := New(s)
+    v, _ := New(s)
     not := []uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -258,7 +258,7 @@ func TestSetLenMore64(t *testing.T) {
         0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     }
-    v := New(s)
+    v, _ := New(s)
     not := []uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
