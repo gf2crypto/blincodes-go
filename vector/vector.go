@@ -2,6 +2,7 @@ package vector
 
 import "bytes"
 import "fmt"
+import "strings"
 
 const wordSize = 64
 const maxInt = 0xFFFFFFFFFFFFFFFF
@@ -20,6 +21,23 @@ func (v *Vector) String() string {
     fs := fmt.Sprintf("%%0%db", wordSize)
     for _, w := range v.body {
         fmt.Fprintf(&buf, fs, w)
+    }
+    if v.lenLast != 0 {
+        s := buf.String()
+        return s[:(len(s) - (wordSize - v.lenLast))]
+    }
+    return buf.String()
+}
+
+// PrettyString returns pretty formatted string of vector representation
+// Example:
+// 0101011 -> -1-1-11
+func (v *Vector) PrettyString() string {
+    var buf bytes.Buffer
+    zeroSub := "-"
+    fs := fmt.Sprintf("%%-%db", wordSize)
+    for _, w := range v.body {
+        fmt.Fprint(&buf, strings.ReplaceAll(fmt.Sprintf(fs, w), "0", zeroSub))
     }
     if v.lenLast != 0 {
         s := buf.String()
