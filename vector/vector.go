@@ -35,7 +35,7 @@ func (v *Vector) String() string {
 func (v *Vector) PrettyString() string {
     var buf bytes.Buffer
     zeroSub := "-"
-    fs := fmt.Sprintf("%%-%db", wordSize)
+    fs := fmt.Sprintf("%%0%db", wordSize)
     for _, w := range v.body {
         fmt.Fprint(&buf, strings.ReplaceAll(fmt.Sprintf(fs, w), "0", zeroSub))
     }
