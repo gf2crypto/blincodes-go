@@ -8,7 +8,7 @@ import (
 func TestNotNil(t *testing.T) {
     v, _ := New(nil)
     res, _ := New(nil)
-    v.Not()
+    v = v.Not()
     if !v.Equal(res) {
         t.Errorf("vector testing: NOT nil is incorrect, NOT nil != nil, but %v",
             v)
@@ -19,7 +19,7 @@ func TestNotNil(t *testing.T) {
 func TestNotEmpty(t *testing.T) {
     v, _ := New([]uint8{})
     res, _ := New(nil)
-    v.Not()
+    v = v.Not()
     if !v.Equal(res) {
         t.Errorf("vector testing: Not empty is incorrect, Not empty != nil, but %v",
             v)
@@ -28,10 +28,6 @@ func TestNotEmpty(t *testing.T) {
 
 //TestNotLess64 tests function Not for vectors of length less than 64
 func TestNotLess64(t *testing.T) {
-    v, _ := New([]uint8{
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-    })
     u, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -40,7 +36,7 @@ func TestNotLess64(t *testing.T) {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
     })
-    v.Not()
+    v := u.Not()
     if !v.Equal(res) {
         t.Errorf("vector testing: Not is incorrect, Not %v = %v != %v",
             u, v, res)
@@ -49,12 +45,6 @@ func TestNotLess64(t *testing.T) {
 
 //TestNot64 tests function Not for vectors of length 64
 func TestNot64(t *testing.T) {
-    v, _ := New([]uint8{
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
-        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
-    })
     u, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -67,7 +57,7 @@ func TestNot64(t *testing.T) {
         1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0,
         1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,
     })
-    v.Not()
+    v := u.Not()
     if !v.Equal(res) {
         t.Errorf("vector testing: Not is incorrect, Not %v = %v != %v",
             u, v, res)
@@ -76,14 +66,6 @@ func TestNot64(t *testing.T) {
 
 //TestNotMore64 tests function Not for vectors of length more than 64
 func TestNotMore64(t *testing.T) {
-    v, _ := New([]uint8{
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
-        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
-        0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
-        0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    })
     u, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -100,7 +82,7 @@ func TestNotMore64(t *testing.T) {
         1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
         1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     })
-    v.Not()
+    v := u.Not()
     if !v.Equal(res) {
         t.Errorf("vector testing: Not is incorrect, Not %v = %v != %v",
             u, v, res)

@@ -97,23 +97,6 @@ func (v *Vector) Get(i int) byte {
     return 1
 }
 
-// Set sets i-th bit of vector to value
-func (v *Vector) Set(i int, val byte) *Vector {
-    if i < 0 {
-        panic(fmt.Errorf("vector: index error %d (expected non-negative integer)", i))
-    }
-    if i >= v.Len() {
-        panic(fmt.Errorf("vector: index %d out of range, expected integer in [0, %d)",
-            i, v.Len()))
-    }
-    if val == 0 {
-        v.body[i/wordSize] &= (maxInt ^ (1 << (wordSize - i%wordSize - 1)))
-    } else {
-        v.body[i/wordSize] |= (1 << (wordSize - i%wordSize - 1))
-    }
-    return v
-}
-
 // Bits returns all bits of vector as slice of bytes
 func (v *Vector) Bits() []byte {
     bits := make([]byte, 0, v.Len())
@@ -156,67 +139,67 @@ func (v *Vector) Zeroes() []int {
 }
 
 //Xor evaluates xor of two vectors.
-//Results of operation is assigned to original vector
-//v ^= v0
+// return v ^ v0
 func (v *Vector) Xor(v0 *Vector) *Vector {
     if v.Len() != v0.Len() {
         panic(fmt.Errorf("vector: vectors have different length: %d != %d",
             v.Len(), v0.Len()))
     }
+    res := v.Copy()
     for i, b := range v0.body {
-        v.body[i] ^= b
+        res.body[i] ^= b
     }
-    return v
+    return res
 }
 
 //Or evaluates or of two vectors.
-//Results of operation is assigned to original vector
-//v |= v0
+//return v | v0
 func (v *Vector) Or(v0 *Vector) *Vector {
     if v.Len() != v0.Len() {
         panic(fmt.Errorf("vector: vectors have different length: %d != %d",
             v.Len(), v0.Len()))
     }
+    res := v.Copy()
     for i, b := range v0.body {
-        v.body[i] |= b
+        res.body[i] |= b
     }
-    return v
+    return res
 }
 
 //And evaluates and of two vectors.
-//Results of operation is assigned to original vector
-//v &= v0
+//return v & v0
 func (v *Vector) And(v0 *Vector) *Vector {
     if v.Len() != v0.Len() {
         panic(fmt.Errorf("vector: vectors have different length: %d != %d",
             v.Len(), v0.Len()))
     }
+    res := v.Copy()
     for i, b := range v0.body {
-        v.body[i] &= b
+        res.body[i] &= b
     }
-    return v
+    return res
 }
 
 //Not evaluates not of vectors.
-//Results of operation is assigned to original vector
-//v = ^v0
+//return ^v
 func (v *Vector) Not() *Vector {
-    for i, b := range v.body {
-        v.body[i] = ^b
+    res := v.Copy()
+    for i, b := range res.body {
+        res.body[i] = ^b
     }
-    if v.lenLast != 0 {
-        v.body[len(v.body)-1] &= (((1 << v.lenLast) - 1) << (wordSize - v.lenLast))
+    if res.lenLast != 0 {
+        res.body[len(res.body)-1] &= (((1 << res.lenLast) - 1) << (wordSize - res.lenLast))
     }
-    return v
+    return res
 }
 
 //Concatenate concatenates of two vectors
-//Results of operation is assigned to original vector
-// v = (v || v0)
+// return (v || v0)
 func (v *Vector) Concatenate(v0 *Vector) *Vector {
     if v0 == nil || len(v0.body) == 0 {
         return v
     }
+    v = v.Copy()
     if v.Len() == 0 {
         // just vopy v0 to v
         v.body = append(make([]uint64, 0, len(v0.body)), v0.body...)

@@ -8,10 +8,10 @@ import (
 func TestNilAndNil(t *testing.T) {
     var w Vector
     v, _ := New(nil)
-    v.And(&w)
-    if !v.Equal(&w) {
+    res := v.And(&w)
+    if !res.Equal(&w) {
         t.Errorf("vector testing: nil AND nil is incorrect, nil AND nil != nil, but %v",
-            v)
+            res)
     }
 }
 
@@ -19,10 +19,10 @@ func TestNilAndNil(t *testing.T) {
 func TestNilAndEmpty(t *testing.T) {
     w, _ := New([]uint8{})
     v, _ := New(nil)
-    v.And(w)
-    if !v.Equal(w) {
+    res := v.And(w)
+    if !res.Equal(w) {
         t.Errorf("vector testing: nil And empty is incorrect, nil And empty != nil, but %v",
-            v)
+            res)
     }
 }
 
@@ -30,19 +30,15 @@ func TestNilAndEmpty(t *testing.T) {
 func TestEmptyAndNil(t *testing.T) {
     v, _ := New([]uint8{})
     w, _ := New(nil)
-    v.And(w)
-    if !v.Equal(w) {
+    res := v.And(w)
+    if !res.Equal(w) {
         t.Errorf("vector testing: empty And nil is incorrect, empty And nil != nil, but %v",
-            v)
+            res)
     }
 }
 
 //TestAndLess64 tests function And for vectors of length less than 64
 func TestAndLess64(t *testing.T) {
-    v, _ := New([]uint8{
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-    })
     u, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -55,7 +51,7 @@ func TestAndLess64(t *testing.T) {
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
-    v.And(w)
+    v := u.And(w)
     if !v.Equal(res) {
         t.Errorf("vector testing: And is incorrect, %v And %v = %v != %v",
             u, w, v, res)
@@ -64,12 +60,6 @@ func TestAndLess64(t *testing.T) {
 
 //TestAnd64 tests function And for vectors of length 64
 func TestAnd64(t *testing.T) {
-    v, _ := New([]uint8{
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
-        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
-    })
     u, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -88,7 +78,7 @@ func TestAnd64(t *testing.T) {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
         0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
     })
-    v.And(w)
+    v := u.And(w)
     if !v.Equal(res) {
         t.Errorf("vector testing: And is incorrect, %v And %v = %v != %v",
             u, w, v, res)
@@ -97,14 +87,6 @@ func TestAnd64(t *testing.T) {
 
 //TestAndMore64 tests function And for vectors of length more than 64
 func TestAndMore64(t *testing.T) {
-    v, _ := New([]uint8{
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
-        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
-        0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
-        0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    })
     u, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
@@ -129,7 +111,7 @@ func TestAndMore64(t *testing.T) {
         0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0,
         1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
-    v.And(w)
+    v := u.And(w)
     if !v.Equal(res) {
         t.Errorf("vector testing: And is incorrect, %v And %v = %v != %v",
             u, w, v, res)

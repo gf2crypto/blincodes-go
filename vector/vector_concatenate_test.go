@@ -8,10 +8,10 @@ import (
 func TestNilConcatenateNil(t *testing.T) {
     var w Vector
     v, _ := New(nil)
-    v.Concatenate(&w)
-    if !v.Equal(&w) {
+    res := v.Concatenate(&w)
+    if !res.Equal(&w) {
         t.Errorf("vector testing: nil.Concatenate(nil) is incorrect, nil.Concatenate(nil) != nil, but %v",
-            v)
+            res)
     }
 }
 
@@ -19,10 +19,10 @@ func TestNilConcatenateNil(t *testing.T) {
 func TestNilConcatenateEmpty(t *testing.T) {
     v, _ := New([]uint8{})
     w, _ := New(nil)
-    v.Concatenate(w)
-    if !v.Equal(w) {
+    res := v.Concatenate(w)
+    if !res.Equal(w) {
         t.Errorf("vector testing: empty.Concatenate(nil) is incorrect, empty.Concatenate(nil) != nil, but %v",
-            v)
+            res)
     }
 }
 
@@ -32,9 +32,8 @@ func TestEmptyConcatenateLen1(t *testing.T) {
     v0, _ := New([]uint8{0})
     v1, _ := New([]uint8{1})
     res, _ := New([]uint8{0, 1})
-    v.Concatenate(v0)
-    v.Concatenate(v1)
-    if !v.Equal(res) {
+    u := v.Concatenate(v0).Concatenate(v1)
+    if !u.Equal(res) {
         t.Errorf("vector testing: empty.Concatenate([0], [1]) is incorrect, is %v, but expected 01",
             v)
     }
@@ -56,7 +55,7 @@ func TestConcatenateLess64(t *testing.T) {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 0,
     })
-    v.Concatenate(w)
+    v = v.Concatenate(w)
     if !v.Equal(res) {
         t.Errorf("vector testing: Len(Concatenate) < 64 is incorrect, is %v, but expected %v",
             v, res)
@@ -79,7 +78,7 @@ func TestConcatenate64(t *testing.T) {
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
     })
-    v.Concatenate(w)
+    v = v.Concatenate(w)
     if !v.Equal(res) {
         t.Errorf("vector testing: Len(Concatenate) == 64 is incorrect, is %v, but expected %v",
             v, res)
@@ -118,7 +117,7 @@ func TestConcatenateMore64(t *testing.T) {
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
-    v.Concatenate(w)
+    v = v.Concatenate(w)
     if !v.Equal(res) {
         t.Errorf("vector testing: Len(Concatenate) > 64 is incorrect, is %v, but expected %v",
             v, res)

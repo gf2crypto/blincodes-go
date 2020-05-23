@@ -8,7 +8,7 @@ import (
 func TestNilXorNil(t *testing.T) {
     var w Vector
     v, _ := New(nil)
-    v.Xor(&w)
+    v = v.Xor(&w)
     if !v.Equal(&w) {
         t.Errorf("vector testing: nil XOR nil is incorrect, nil XOR nil != nil, but %v",
             v)
@@ -19,7 +19,7 @@ func TestNilXorNil(t *testing.T) {
 func TestNilXorEmpty(t *testing.T) {
     w, _ := New([]uint8{})
     v, _ := New(nil)
-    v.Xor(w)
+    v = v.Xor(w)
     if !v.Equal(w) {
         t.Errorf("vector testing: nil XOR empty is incorrect, nil XOR empty != nil, but %v",
             v)
@@ -30,7 +30,7 @@ func TestNilXorEmpty(t *testing.T) {
 func TestEmptyXorNil(t *testing.T) {
     v, _ := New([]uint8{})
     w, _ := New(nil)
-    v.Xor(w)
+    v = v.Xor(w)
     if !v.Equal(w) {
         t.Errorf("vector testing: empty XOR nil is incorrect, empty XOR nil != nil, but %v",
             v)
@@ -39,10 +39,6 @@ func TestEmptyXorNil(t *testing.T) {
 
 //TestXorLess64 tests function Xor for vectors of length less than 64
 func TestXorLess64(t *testing.T) {
-    v, _ := New([]uint8{
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-    })
     u, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -55,7 +51,7 @@ func TestXorLess64(t *testing.T) {
         1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
     })
-    v.Xor(w)
+    v := u.Xor(w)
     if !v.Equal(res) {
         t.Errorf("vector testing: XOR is incorrect, %v XOR %v = %v != %v",
             u, w, v, res)
@@ -64,12 +60,6 @@ func TestXorLess64(t *testing.T) {
 
 //TestXor64 tests function Xor for vectors of length 64
 func TestXor64(t *testing.T) {
-    v, _ := New([]uint8{
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
-        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
-    })
     u, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -88,7 +78,7 @@ func TestXor64(t *testing.T) {
         0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
         1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,
     })
-    v.Xor(w)
+    v := u.Xor(w)
     if !v.Equal(res) {
         t.Errorf("vector testing: XOR is incorrect, %v XOR %v = %v != %v",
             u, w, v, res)
@@ -97,14 +87,6 @@ func TestXor64(t *testing.T) {
 
 //TestXorMore64 tests function Xor for vectors of length more than 64
 func TestXorMore64(t *testing.T) {
-    v, _ := New([]uint8{
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
-        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
-        0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
-        0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    })
     u, _ := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
@@ -129,7 +111,7 @@ func TestXorMore64(t *testing.T) {
         0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1,
         0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     })
-    v.Xor(w)
+    v := u.Xor(w)
     if !v.Equal(res) {
         t.Errorf("vector testing: XOR is incorrect, %v XOR %v = %v != %v",
             u, w, v, res)
