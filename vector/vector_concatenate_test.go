@@ -123,3 +123,62 @@ func TestConcatenateMore64(t *testing.T) {
             v, res)
     }
 }
+
+//TestConcatenateMore64SmallLast1 tests function Concatenate for vectors of length more than 64
+func TestConcatenateMore64SmallLast1(t *testing.T) {
+    v, _ := New([]uint8{
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
+        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1,
+    })
+    w, _ := New([]uint8{
+        0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
+        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    })
+    res, _ := New([]uint8{
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
+        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1,
+        0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
+        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    })
+    v = v.Concatenate(w)
+    if !v.Equal(res) {
+        t.Errorf("vector testing: Len(Concatenate) > 64 is incorrect, is %v, but expected %v",
+            v, res)
+    }
+}
+
+//TestConcatenateMore64SmallLast2 tests function Concatenate for vectors of length more than 64
+func TestConcatenateMore64SmallLast2(t *testing.T) {
+    v, _ := New([]uint8{
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
+        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1,
+    })
+    w, _ := New([]uint8{
+        0, 1, 1, 0, 1, 1,
+    })
+    res, _ := New([]uint8{
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
+        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1,
+    })
+    v = v.Concatenate(w)
+    if !v.Equal(res) {
+        t.Errorf("vector testing: Len(Concatenate) > 64 is incorrect, is %v, but expected %v",
+            v, res)
+    }
+}

@@ -199,42 +199,27 @@ func (v *Vector) Concatenate(v0 *Vector) *Vector {
     if v0 == nil || len(v0.body) == 0 {
         return v
     }
-    v = v.Copy()
     if v.Len() == 0 {
         // just vopy v0 to v
-        v.body = append(make([]uint64, 0, len(v0.body)), v0.body...)
-        v.lenLast = v0.lenLast
-        return v
+        return &Vector{body: append(make([]uint64, 0, len(v0.body)), v0.body...), lenLast: v0.lenLast}
     }
     if v.lenLast == 0 {
-        v.body = append(v.body, v0.body...)
-        v.lenLast = v0.lenLast
-        return v
+        return &Vector{body: append(v.body, v0.body...), lenLast: v0.lenLast}
     }
-    // v.lenLast !=0, len(v0.body) >= 1
-    // We have to shift of v0 to left
-    newLen := v.Len() + v0.Len()
-    newSize := int(newLen / wordSize)
-    newLenLast := newLen % wordSize
-    if newLenLast != 0 {
-        newSize++
-    }
-    // resize body
-    oldSize := len(v.body) // oldSize >=1
-    v.body = append(v.body, make([]uint64, newSize-len(v.body))...)
-    var mask uint64 = ((1 << (wordSize - v.lenLast)) - 1) << v.lenLast
-    var rest uint64
-    j := 0
-    for i := oldSize; i < len(v.body)+1; i++ {
-        rest = (v0.body[j] & mask) >> v.lenLast
-        v.body[i-1] ^= rest
-        if i < len(v.body) {
-            v.body[i] = v0.body[j] << (wordSize - v.lenLast)
+    r := wordSize - v.lenLast
+    mask := ((1 << r) - 1) << v.lenLast
+    if v0.lenLast <= r {
+        body := make([]uint64, 0, len(v.body)+len(v0.body)-1)
+        body = append(body, v.body...)
+        if len(v0.body) > 1 {
+            body = append(body, v0.ShiftLeft(uint(r)).body[:len(v0.body)-1]...)
         }
-        j++
+        body[len(v.body)-1] ^= ((v0.body[0] & uint64(mask)) >> v.lenLast)
+        return &Vector{body: body, lenLast: (v0.lenLast + v.lenLast) % wordSize}
     }
-    v.lenLast = newLenLast
-    return v
+    body := append(v.body, v0.ShiftLeft(uint(r)).body...)
+    body[len(v.body)-1] ^= ((v0.body[0] & uint64(mask)) >> v.lenLast)
+    return &Vector{body: body, lenLast: v0.lenLast - r}
 }
 
 // set sets i-th bit of vector to value
