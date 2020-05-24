@@ -236,3 +236,20 @@ func (v *Vector) Concatenate(v0 *Vector) *Vector {
     v.lenLast = newLenLast
     return v
 }
+
+// set sets i-th bit of vector to value
+func (v *Vector) set(i int, val byte) *Vector {
+    if i < 0 {
+        panic(fmt.Errorf("vector: index error %d (expected non-negative integer)", i))
+    }
+    if i >= v.Len() {
+        panic(fmt.Errorf("vector: index %d out of range, expected integer in [0, %d)",
+            i, v.Len()))
+    }
+    if val == 0 {
+        v.body[i/wordSize] &= (maxInt ^ (1 << (wordSize - i%wordSize - 1)))
+    } else {
+        v.body[i/wordSize] |= (1 << (wordSize - i%wordSize - 1))
+    }
+    return v
+}
