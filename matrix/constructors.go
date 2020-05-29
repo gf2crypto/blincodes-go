@@ -77,7 +77,7 @@ func New(params ...interface{}) *Matrix {
     ncolumns = slice.Len() / nrows
     body := make([](*vector.Vector), nrows)
     for i := 0; i < nrows; i++ {
-        body[i], _ = vector.New(slice.GetSlice(i*ncolumns, (i+1)*ncolumns))
+        body[i] = vector.New(slice.GetSlice(i*ncolumns, (i+1)*ncolumns))
     }
     return &Matrix{body: body, ncolumns: ncolumns}
 }
@@ -99,11 +99,7 @@ func newFromStrings(s []string) *Matrix {
     }
     body := make([](*vector.Vector), nrows)
     for i, r := range rows {
-        var e error
-        body[i], e = vector.New(r)
-        if e != nil {
-            panic(fmt.Errorf("matrix: cannot convert %v to vector, error: %v", r, e))
-        }
+        body[i] = vector.New(r)
         if (i > 0) && (body[i].Len() != body[0].Len()) {
             panic(fmt.Errorf("matrix: expected the same length of rows, but len(Matrix[%v]=%v) != len(Matrix[0]=%v): %v != %v",
                 i, body[i], body[0], body[i].Len(), body[0].Len()))
@@ -118,7 +114,7 @@ func newEmpty(m, n int) *Matrix {
     }
     body := make([](*vector.Vector), m)
     for i := range body {
-        body[i], _ = vector.New(n)
+        body[i] = vector.New(n)
     }
     return &Matrix{body: body, ncolumns: n}
 }
