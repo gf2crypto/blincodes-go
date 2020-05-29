@@ -5,7 +5,6 @@ import "fmt"
 
 // New creates vector object
 func New(body interface{}) (*Vector, error) {
-    var v *Vector
     switch b := body.(type) {
     case nil:
         return newEmpty(0), nil
@@ -13,150 +12,25 @@ func New(body interface{}) (*Vector, error) {
         return newFromString(&b)
     case int:
         return newEmpty(b), nil
-    case []uint:
-        {
-            v = newEmpty(len(b))
-            for i, bit := range b {
-                switch {
-                case bit == 1:
-                    v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
-                case bit != 0:
-                    e := fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
-                        bit, i)
-                    return nil, e
-                }
-            }
-        }
-    case []uint8:
-        {
-            v = newEmpty(len(b))
-            for i, bit := range b {
-                switch {
-                case bit == 1:
-                    v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
-                case bit != 0:
-                    e := fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
-                        bit, i)
-                    return nil, e
-                }
-            }
-        }
-    case []uint16:
-        {
-            v = newEmpty(len(b))
-            for i, bit := range b {
-                switch {
-                case bit == 1:
-                    v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
-                case bit != 0:
-                    e := fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
-                        bit, i)
-                    return nil, e
-                }
-            }
-        }
-    case []uint32:
-        {
-            v = newEmpty(len(b))
-            for i, bit := range b {
-                switch {
-                case bit == 1:
-                    v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
-                case bit != 0:
-                    e := fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
-                        bit, i)
-                    return nil, e
-                }
-            }
-        }
-    case []uint64:
-        {
-            v = newEmpty(len(b))
-            for i, bit := range b {
-                switch {
-                case bit == 1:
-                    v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
-                case bit != 0:
-                    e := fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
-                        bit, i)
-                    return nil, e
-                }
-            }
-        }
-    case []int:
-        {
-            v = newEmpty(len(b))
-            for i, bit := range b {
-                switch {
-                case bit == 1:
-                    v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
-                case bit != 0:
-                    e := fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
-                        bit, i)
-                    return nil, e
-                }
-            }
-        }
-    case []int8:
-        {
-            v = newEmpty(len(b))
-            for i, bit := range b {
-                switch {
-                case bit == 1:
-                    v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
-                case bit != 0:
-                    e := fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
-                        bit, i)
-                    return nil, e
-                }
-            }
-        }
-    case []int16:
-        {
-            v = newEmpty(len(b))
-            for i, bit := range b {
-                switch {
-                case bit == 1:
-                    v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
-                case bit != 0:
-                    e := fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
-                        bit, i)
-                    return nil, e
-                }
-            }
-        }
-    case []int32:
-        {
-            v = newEmpty(len(b))
-            for i, bit := range b {
-                switch {
-                case bit == 1:
-                    v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
-                case bit != 0:
-                    e := fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
-                        bit, i)
-                    return nil, e
-                }
-            }
-        }
-    case []int64:
-        {
-            v = newEmpty(len(b))
-            for i, bit := range b {
-                switch {
-                case bit == 1:
-                    v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
-                case bit != 0:
-                    e := fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
-                        bit, i)
-                    return nil, e
-                }
-            }
-        }
     default:
-        return nil, fmt.Errorf("vector: unsupported type %T, supported only: [](u)int(8,16, 32, 64), (u)int, string, nil", b)
+        {
+            slice, e := ToSlicer(b)
+            if e != nil {
+                return nil, fmt.Errorf("vector: unsupported type %T, supported only: [](u)int(8,16, 32, 64), (u)int, string, nil", b)
+            }
+            v := newEmpty(slice.Len())
+            for i := 0; i < slice.Len(); i++ {
+                switch bit := slice.GetElement(i); {
+                case bit == 1:
+                    v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
+                case bit != 0:
+                    return nil, fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
+                        bit, i)
+                }
+            }
+            return v, nil
+        }
     }
-    return v, nil
 }
 
 // newFromString converts string to Vector

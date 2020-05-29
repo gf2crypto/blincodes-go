@@ -6,213 +6,80 @@ import "fmt"
 
 // New creates Matrix object
 // Parameters:
-//     nrows int - number of rows of the Matrix
-//     param - int, string, []string, []int{,8,16,32,64}, []uint{, 8, 16, 32, 64}
+//     New() creates empty matrix
+//     New(n (u)int{, 8, 16, 32}) create (n x n) zero matrix
+//     New(m, n (u)int{, 8, 16, 32}) creates (m x n) zero matrix
+//     New(s string) creates Matrix from string, uses row-separator \n
+//          Example:             Result:
+//              ` 11111111             11111111
+//                ----1111             00001111
+//                00110011             00110011
+//                01-101-1`            01010101
+//     New(s []string) creates Matrix from string array, every element of this array is row
+//           Example:                   Result:
+//           []string{
+//              "11111111",                11111111
+//              "- - --1 111",             00001111
+//              "00110011",                00110011
+//              "01-10   1 -1",            01010101
+//           }
+//     New(m, (u)int{, 8, 16, 32}) creates Matrix with m rows from integer array, len of this array must be divided to m
 func New(params ...interface{}) *Matrix {
     if len(params) == 0 {
-        return newEmpty(0)
+        return newEmpty(0, 0)
     }
     if len(params) == 1 {
         switch t := params[0].(type) {
-        case int:
-            return newEmpty(int(t))
-        case int8:
-            return newEmpty(int(t))
-        case int16:
-            return newEmpty(int(t))
-        case int32:
-            return newEmpty(int(t))
-        case int64:
-            return newEmpty(int(t))
-        case uint:
-            return newEmpty(int(t))
-        case uint8:
-            return newEmpty(int(t))
-        case uint16:
-            return newEmpty(int(t))
-        case uint32:
-            return newEmpty(int(t))
-        case uint64:
-            return newEmpty(int(t))
+        case nil:
+            return newEmpty(0, 0)
         case []string:
             return newFromStrings(t)
         case string:
             return newFromStrings(strings.Split(t, "\n"))
         default:
-            panic(fmt.Errorf("matrix: cannot convert %T to Matrix", t))
+            var n int
+            var e error
+            if n, e = toInt(t); e != nil {
+                panic(e)
+            }
+            return newEmpty(n, n)
         }
     }
     if len(params) > 2 {
-        e := fmt.Errorf("matrix: expected number of parameters less or equal 2, but got %v > 2", len(params))
-        panic(e)
+        panic(fmt.Errorf("matrix: expected number of parameters less or equal 2, but got %v > 2", len(params)))
     }
     // len(params) == 2
     var nrows int
-    switch p := params[0].(type) {
-    case int:
-        nrows = int(p)
-    case int8:
-        nrows = int(p)
-    case int16:
-        nrows = int(p)
-    case int32:
-        nrows = int(p)
-    case int64:
-        nrows = int(p)
-    case uint:
-        nrows = int(p)
-    case uint8:
-        nrows = int(p)
-    case uint16:
-        nrows = int(p)
-    case uint32:
-        nrows = int(p)
-    case uint64:
-        nrows = int(p)
-    default:
-        e := fmt.Errorf("matrix: expected type of nrows integer, type %T is not supported", nrows)
-        panic(e)
+    var e error
+    nrows, e = toInt(params[0])
+    if e != nil {
+        panic(fmt.Errorf("matrix: expected type of nrows integer, type %T is not supported", nrows))
     }
-    if nrows == 0 {
-        return newEmpty(0)
+    if nrows <= 0 {
+        return newEmpty(0, 0)
     }
-    switch b := params[1].(type) {
-    case nil:
-        return newEmpty(nrows)
-    case []uint:
-        {
-            if len(b)%nrows != 0 {
-                e := fmt.Errorf("matrix: cannot create Matrix with nrows from %T, len(%v) %% %v", b, b, nrows)
-                panic(e)
-            }
-            ncolumns := len(b) % nrows
-            body := make([](*vector.Vector), nrows)
-            for i := 0; i < nrows; i++ {
-                body[i], _ = vector.New(b[i*ncolumns : (i+1)*ncolumns])
-            }
-            return &Matrix{body: body, ncolumns: ncolumns, nrows: nrows}
-        }
-    case []uint8:
-        {
-            if len(b)%nrows != 0 {
-                e := fmt.Errorf("matrix: cannot create Matrix with nrows from %T, len(%v) %% %v", b, b, nrows)
-                panic(e)
-            }
-            ncolumns := len(b) % nrows
-            body := make([](*vector.Vector), nrows)
-            for i := 0; i < nrows; i++ {
-                body[i], _ = vector.New(b[i*ncolumns : (i+1)*ncolumns])
-            }
-            return &Matrix{body: body, ncolumns: ncolumns, nrows: nrows}
-        }
-    case []uint16:
-        {
-            if len(b)%nrows != 0 {
-                e := fmt.Errorf("matrix: cannot create Matrix with nrows from %T, len(%v) %% %v", b, b, nrows)
-                panic(e)
-            }
-            ncolumns := len(b) % nrows
-            body := make([](*vector.Vector), nrows)
-            for i := 0; i < nrows; i++ {
-                body[i], _ = vector.New(b[i*ncolumns : (i+1)*ncolumns])
-            }
-            return &Matrix{body: body, ncolumns: ncolumns, nrows: nrows}
-        }
-    case []uint32:
-        {
-            if len(b)%nrows != 0 {
-                e := fmt.Errorf("matrix: cannot create Matrix with nrows from %T, len(%v) %% %v", b, b, nrows)
-                panic(e)
-            }
-            ncolumns := len(b) % nrows
-            body := make([](*vector.Vector), nrows)
-            for i := 0; i < nrows; i++ {
-                body[i], _ = vector.New(b[i*ncolumns : (i+1)*ncolumns])
-            }
-            return &Matrix{body: body, ncolumns: ncolumns, nrows: nrows}
-        }
-    case []uint64:
-        {
-            if len(b)%nrows != 0 {
-                e := fmt.Errorf("matrix: cannot create Matrix with nrows from %T, len(%v) %% %v", b, b, nrows)
-                panic(e)
-            }
-            ncolumns := len(b) % nrows
-            body := make([](*vector.Vector), nrows)
-            for i := 0; i < nrows; i++ {
-                body[i], _ = vector.New(b[i*ncolumns : (i+1)*ncolumns])
-            }
-            return &Matrix{body: body, ncolumns: ncolumns, nrows: nrows}
-        }
-    case []int:
-        {
-            if len(b)%nrows != 0 {
-                e := fmt.Errorf("matrix: cannot create Matrix with nrows from %T, len(%v) %% %v", b, b, nrows)
-                panic(e)
-            }
-            ncolumns := len(b) % nrows
-            body := make([](*vector.Vector), nrows)
-            for i := 0; i < nrows; i++ {
-                body[i], _ = vector.New(b[i*ncolumns : (i+1)*ncolumns])
-            }
-            return &Matrix{body: body, ncolumns: ncolumns, nrows: nrows}
-        }
-    case []int8:
-        {
-            if len(b)%nrows != 0 {
-                e := fmt.Errorf("matrix: cannot create Matrix with nrows from %T, len(%v) %% %v", b, b, nrows)
-                panic(e)
-            }
-            ncolumns := len(b) % nrows
-            body := make([](*vector.Vector), nrows)
-            for i := 0; i < nrows; i++ {
-                body[i], _ = vector.New(b[i*ncolumns : (i+1)*ncolumns])
-            }
-            return &Matrix{body: body, ncolumns: ncolumns, nrows: nrows}
-        }
-    case []int16:
-        {
-            if len(b)%nrows != 0 {
-                e := fmt.Errorf("matrix: cannot create Matrix with nrows from %T, len(%v) %% %v", b, b, nrows)
-                panic(e)
-            }
-            ncolumns := len(b) % nrows
-            body := make([](*vector.Vector), nrows)
-            for i := 0; i < nrows; i++ {
-                body[i], _ = vector.New(b[i*ncolumns : (i+1)*ncolumns])
-            }
-            return &Matrix{body: body, ncolumns: ncolumns, nrows: nrows}
-        }
-    case []int32:
-        {
-            if len(b)%nrows != 0 {
-                e := fmt.Errorf("matrix: cannot create Matrix with nrows from %T, len(%v) %% %v", b, b, nrows)
-                panic(e)
-            }
-            ncolumns := len(b) % nrows
-            body := make([](*vector.Vector), nrows)
-            for i := 0; i < nrows; i++ {
-                body[i], _ = vector.New(b[i*ncolumns : (i+1)*ncolumns])
-            }
-            return &Matrix{body: body, ncolumns: ncolumns, nrows: nrows}
-        }
-    case []int64:
-        {
-            if len(b)%nrows != 0 {
-                e := fmt.Errorf("matrix: cannot create Matrix with nrows from %T, len(%v) %% %v", b, b, nrows)
-                panic(e)
-            }
-            ncolumns := len(b) % nrows
-            body := make([](*vector.Vector), nrows)
-            for i := 0; i < nrows; i++ {
-                body[i], _ = vector.New(b[i*ncolumns : (i+1)*ncolumns])
-            }
-            return &Matrix{body: body, ncolumns: ncolumns, nrows: nrows}
-        }
-    default:
-        e := fmt.Errorf("matrix: unsupported type %T, cannot create matrix form (%v, %T)", b, nrows, b)
-        panic(e)
+    if params[1] == nil {
+        return newEmpty(nrows, nrows)
     }
+    var ncolumns int
+    ncolumns, e = toInt(params[1])
+    if e == nil {
+        return newEmpty(nrows, ncolumns)
+    }
+    var slice vector.Slicer
+    slice, e = vector.ToSlicer(params[1])
+    if e != nil {
+        panic(fmt.Errorf("matrix: unsupported type %T, cannot create matrix form (%v, %T)", params[1], nrows, params[1]))
+    }
+    if slice.Len()%nrows != 0 {
+        panic(fmt.Errorf("matrix: cannot create Matrix with nrows, len of input array must divided to nrows, but %v mod %v = %v != 0", slice.Len(), nrows, slice.Len()%nrows))
+    }
+    ncolumns = slice.Len() / nrows
+    body := make([](*vector.Vector), nrows)
+    for i := 0; i < nrows; i++ {
+        body[i], _ = vector.New(slice.GetSlice(i*ncolumns, (i+1)*ncolumns))
+    }
+    return &Matrix{body: body, ncolumns: ncolumns}
 }
 
 // newFromStrings converts array string to Matrix
@@ -228,7 +95,7 @@ func newFromStrings(s []string) *Matrix {
         }
     }
     if len(rows) == 0 {
-        return &Matrix{body: make([](*vector.Vector), 0), nrows: 0, ncolumns: 0}
+        return &Matrix{body: make([](*vector.Vector), 0), ncolumns: 0}
     }
     body := make([](*vector.Vector), nrows)
     for i, r := range rows {
@@ -242,16 +109,16 @@ func newFromStrings(s []string) *Matrix {
                 i, body[i], body[0], body[i].Len(), body[0].Len()))
         }
     }
-    return &Matrix{body: body, nrows: len(body), ncolumns: body[0].Len()}
+    return &Matrix{body: body, ncolumns: body[0].Len()}
 }
 
-func newEmpty(n int) *Matrix {
-    if n <= 0 {
-        return &Matrix{body: make([](*vector.Vector), 0, 0), nrows: 0, ncolumns: 0}
+func newEmpty(m, n int) *Matrix {
+    if m <= 0 || n <= 0 {
+        return &Matrix{body: make([](*vector.Vector), 0, 0), ncolumns: 0}
     }
-    body := make([](*vector.Vector), n)
+    body := make([](*vector.Vector), m)
     for i := range body {
         body[i], _ = vector.New(n)
     }
-    return &Matrix{body: body, nrows: n, ncolumns: n}
+    return &Matrix{body: body, ncolumns: n}
 }
