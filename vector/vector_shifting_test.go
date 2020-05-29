@@ -6,7 +6,7 @@ import (
 
 //TestNilShift tests functions ShiftLeft and ShiftRight for nil vectors
 func TestNilShift(t *testing.T) {
-    v, _ := New(nil)
+    v := New(nil)
     resL := v.ShiftLeft(10)
     if !resL.Equal(v) {
         t.Errorf("vector testing: nil.ShiftLeft(10) is incorrect, nil.ShiftLeft(10) != nil, but %v",
@@ -21,9 +21,9 @@ func TestNilShift(t *testing.T) {
 
 //TestShiftLen1 tests functions ShiftLeft and ShiftRight for vector of length 1
 func TestShiftLen1(t *testing.T) {
-    v0, _ := New([]uint8{0})
-    v1, _ := New([]uint8{1})
-    res, _ := New([]uint8{0})
+    v0 := New([]uint8{0})
+    v1 := New([]uint8{1})
+    res := New([]uint8{0})
     v := v0.ShiftLeft(0)
     if !v.Equal(v0) {
         t.Errorf("vector testing: [0].ShiftLeft(0) is incorrect, is %v, but expected [0]",
@@ -89,33 +89,33 @@ func TestShiftLen1(t *testing.T) {
 
 //TestShiftLess64 tests functions ShiftLeft and ShiftRight for vectors of length less than 64
 func TestShiftLess64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0,
     })
-    resLeft1, _ := New([]uint8{
+    resLeft1 := New([]uint8{
         0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 0,
     })
-    resRight1, _ := New([]uint8{
+    resRight1 := New([]uint8{
         0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1,
     })
-    resLeft21, _ := New([]uint8{
+    resLeft21 := New([]uint8{
         1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0,
     })
-    resRight21, _ := New([]uint8{
+    resRight21 := New([]uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0,
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1,
     })
-    resZero, _ := New(40)
+    resZero := New(40)
     res := v.ShiftLeft(0)
     if !res.Equal(v) {
         t.Errorf("vector testing: %v.ShiftLeft(0) is incorrect, is %v, but expected %v",
@@ -161,37 +161,37 @@ func TestShiftLess64(t *testing.T) {
 
 //TestShift64 tests functions ShiftLeft and ShiftRight for vectors of length 64
 func TestShift64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
     })
-    resLeft1, _ := New([]uint8{
+    resLeft1 := New([]uint8{
         0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0,
     })
-    resRight1, _ := New([]uint8{
+    resRight1 := New([]uint8{
         0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1,
     })
-    resLeft28, _ := New([]uint8{
+    resLeft28 := New([]uint8{
         1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1,
         0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1,
         0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     })
-    resRight28, _ := New([]uint8{
+    resRight28 := New([]uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1,
         0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1,
         1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1,
     })
-    resZero, _ := New(v.Len())
+    resZero := New(v.Len())
     res := v.ShiftLeft(0)
     if !res.Equal(v) {
         t.Errorf("vector testing: %v.ShiftLeft(0) is incorrect, is %v, but expected %v",
@@ -237,21 +237,21 @@ func TestShift64(t *testing.T) {
 
 //TestShiftMore64 tests functions ShiftLeft and ShiftRight for vectors of length more than 64
 func TestShiftMore64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
         0, 1, 1, 0, 1, 0, 0, 1, 1,
     })
-    resLeft1, _ := New([]uint8{
+    resLeft1 := New([]uint8{
         0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
         0, 1, 1, 0, 1, 0, 0, 1, 1, 0,
     })
-    resRight1, _ := New([]uint8{
+    resRight1 := New([]uint8{
         0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
@@ -259,14 +259,14 @@ func TestShiftMore64(t *testing.T) {
         0, 1, 1, 0, 1, 0, 0, 1,
     }) //00000000000000000000000000000000000000
     //0000000000000000000000000000
-    resLeft28, _ := New([]uint8{
+    resLeft28 := New([]uint8{
         1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1,
         0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1,
         0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0,
     })
-    resRight28, _ := New([]uint8{
+    resRight28 := New([]uint8{
         0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -274,14 +274,14 @@ func TestShiftMore64(t *testing.T) {
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0,
     })
-    resLeft67, _ := New([]uint8{
+    resLeft67 := New([]uint8{
         0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0,
     })
-    resRight67, _ := New([]uint8{
+    resRight67 := New([]uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -289,7 +289,7 @@ func TestShiftMore64(t *testing.T) {
         0, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 0, 0, 1, 0, 1,
     })
-    resZero, _ := New(v.Len())
+    resZero := New(v.Len())
     res := v.ShiftLeft(0)
     if !res.Equal(v) {
         t.Errorf("vector testing: %v.ShiftLeft(0) is incorrect, is %v, but expected %v",

@@ -6,7 +6,7 @@ import (
 
 //TestNilRotate tests functions RotateLeft and RotateRight for nil vectors
 func TestNilRotate(t *testing.T) {
-    v, _ := New(nil)
+    v := New(nil)
     resL := v.RotateLeft(10)
     if !resL.Equal(v) {
         t.Errorf("vector testing: nil.RotateLeft(10) is incorrect, nil.RotateLeft(10) != nil, but %v",
@@ -21,8 +21,8 @@ func TestNilRotate(t *testing.T) {
 
 //TestRotateLen1 tests functions RotateLeft and RotateRight for vector of length 1
 func TestRotateLen1(t *testing.T) {
-    v0, _ := New([]uint8{0})
-    v1, _ := New([]uint8{1})
+    v0 := New([]uint8{0})
+    v1 := New([]uint8{1})
     v := v0.RotateLeft(0)
     if !v.Equal(v0) {
         t.Errorf("vector testing: [0].RotateLeft(0) is incorrect, is %v, but expected [0]",
@@ -88,28 +88,28 @@ func TestRotateLen1(t *testing.T) {
 
 //TestRotateLess64 tests functions RotateLeft and RotateRight for vectors of length less than 64
 func TestRotateLess64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0,
     })
-    resLeft1, _ := New([]uint8{
+    resLeft1 := New([]uint8{
         0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1,
     })
-    resRight1, _ := New([]uint8{
+    resRight1 := New([]uint8{
         0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1,
     })
-    resLeft21, _ := New([]uint8{
+    resLeft21 := New([]uint8{
         1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0,
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1,
     })
-    resRight21, _ := New([]uint8{
+    resRight21 := New([]uint8{
         1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0,
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
@@ -160,32 +160,32 @@ func TestRotateLess64(t *testing.T) {
 
 //TestRotate64 tests functions RotateLeft and RotateRight for vectors of length 64
 func TestRotate64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
     })
-    resLeft1, _ := New([]uint8{
+    resLeft1 := New([]uint8{
         0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1,
     })
-    resRight1, _ := New([]uint8{
+    resRight1 := New([]uint8{
         0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1,
     })
-    resLeft28, _ := New([]uint8{
+    resLeft28 := New([]uint8{
         1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0,
     })
-    resRight28, _ := New([]uint8{
+    resRight28 := New([]uint8{
         1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
@@ -237,28 +237,28 @@ func TestRotate64(t *testing.T) {
 
 //TestRotateMore64 tests functions RotateLeft and RotateRight for vectors of length more than 64
 func TestRotateMore64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
         0, 1, 1, 0, 1, 0, 0, 1, 1,
     })
-    resLeft1, _ := New([]uint8{
+    resLeft1 := New([]uint8{
         0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
         0, 1, 1, 0, 1, 0, 0, 1, 1, 1,
     })
-    resRight1, _ := New([]uint8{
+    resRight1 := New([]uint8{
         1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
         0, 1, 1, 0, 1, 0, 0, 1,
     })
-    resLeft28, _ := New([]uint8{
+    resLeft28 := New([]uint8{
         1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
@@ -266,7 +266,7 @@ func TestRotateMore64(t *testing.T) {
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0,
     })
-    resRight28, _ := New([]uint8{
+    resRight28 := New([]uint8{
         1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
         0, 1, 1, 0, 1, 0, 0, 1, 1,
@@ -274,7 +274,7 @@ func TestRotateMore64(t *testing.T) {
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0,
     })
-    resLeft67, _ := New([]uint8{
+    resLeft67 := New([]uint8{
         0, 1, 0, 0, 1, 1,
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
@@ -282,7 +282,7 @@ func TestRotateMore64(t *testing.T) {
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
         0, 1, 1,
     })
-    resRight67, _ := New([]uint8{
+    resRight67 := New([]uint8{
         1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
@@ -290,14 +290,14 @@ func TestRotateMore64(t *testing.T) {
         0, 1, 1, 0, 1, 0, 0, 1, 1,
         1, 0, 0, 1, 0, 1,
     })
-    resLeft80, _ := New([]uint8{
+    resLeft80 := New([]uint8{
         1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,
         1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0,
         0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1,
     })
-    resRight80, _ := New([]uint8{
+    resRight80 := New([]uint8{
         1, 0, 1, 0, 0, 1, 1,
         1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0,
         0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1,

@@ -6,7 +6,7 @@ import (
 
 //TestPrettyStringNil tests function PrettyString for nil vector
 func TestPrettyStringNil(t *testing.T) {
-    v, _ := New(0)
+    v := New(0)
     if v.PrettyString() != "" {
         t.Errorf("vector testing: PrettyString() is incorrect, %s != \"\"",
             v.PrettyString())
@@ -15,7 +15,7 @@ func TestPrettyStringNil(t *testing.T) {
 
 //TestPrettyStringEmpty tests function PrettyString for empty vector
 func TestPrettyStringEmpty(t *testing.T) {
-    v, _ := New([]byte{})
+    v := New([]byte{})
     if v.PrettyString() != "" {
         t.Errorf("vector testing: PrettyString() is incorrect, %s != \"\"",
             v.PrettyString())
@@ -24,12 +24,12 @@ func TestPrettyStringEmpty(t *testing.T) {
 
 //TestPrettyStringLen1 tests function PrettyString for vector of length 1
 func TestPrettyStringLen1(t *testing.T) {
-    v, _ := New([]uint32{0})
+    v := New([]uint32{0})
     if v.PrettyString() != "-" {
         t.Errorf("vector testing: PrettyString() is incorrect, %s != \"\"",
             v.PrettyString())
     }
-    v, _ = New([]uint32{1})
+    v = New([]uint32{1})
     if v.PrettyString() != "1" {
         t.Errorf("vector testing: PrettyString() is incorrect, %s != \"\"",
             v.PrettyString())
@@ -38,7 +38,7 @@ func TestPrettyStringLen1(t *testing.T) {
 
 //TestPrettyStringLenLess64 tests function PrettyString for vector of length less than 64
 func TestPrettyStringLenLess64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
@@ -51,7 +51,7 @@ func TestPrettyStringLenLess64(t *testing.T) {
 
 //TestPrettyStringLen64 tests function PrettyString for vector of length 64
 func TestPrettyStringLen64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -66,7 +66,7 @@ func TestPrettyStringLen64(t *testing.T) {
 
 //TestPrettyStringLenMore64 tests function PrettyString for vector of length more than 64
 func TestPrettyStringLenMore64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -79,7 +79,7 @@ func TestPrettyStringLenMore64(t *testing.T) {
         t.Errorf("vector testing: PrettyString() is incorrect, %s != %s",
             v.PrettyString(), res)
     }
-    v, _ = New([]uint8{
+    v = New([]uint8{
         0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,

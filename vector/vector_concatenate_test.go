@@ -7,7 +7,7 @@ import (
 //TestNilConcatenateNil tests function Concatenate of two nil vectors
 func TestNilConcatenateNil(t *testing.T) {
     var w Vector
-    v, _ := New(nil)
+    v := New(nil)
     res := v.Concatenate(&w)
     if !res.Equal(&w) {
         t.Errorf("vector testing: nil.Concatenate(nil) is incorrect, nil.Concatenate(nil) != nil, but %v",
@@ -17,8 +17,8 @@ func TestNilConcatenateNil(t *testing.T) {
 
 //TestNilConcatenateEmpty tests function Concatenate of nil vector and empty vector
 func TestNilConcatenateEmpty(t *testing.T) {
-    v, _ := New([]uint8{})
-    w, _ := New(nil)
+    v := New([]uint8{})
+    w := New(nil)
     res := v.Concatenate(w)
     if !res.Equal(w) {
         t.Errorf("vector testing: empty.Concatenate(nil) is incorrect, empty.Concatenate(nil) != nil, but %v",
@@ -28,10 +28,10 @@ func TestNilConcatenateEmpty(t *testing.T) {
 
 //TestEmptyConcatenateLen1 tests function Concatenate of empty vector and vector of length 1
 func TestEmptyConcatenateLen1(t *testing.T) {
-    v, _ := New(nil)
-    v0, _ := New([]uint8{0})
-    v1, _ := New([]uint8{1})
-    res, _ := New([]uint8{0, 1})
+    v := New(nil)
+    v0 := New([]uint8{0})
+    v1 := New([]uint8{1})
+    res := New([]uint8{0, 1})
     u := v.Concatenate(v0).Concatenate(v1)
     if !u.Equal(res) {
         t.Errorf("vector testing: empty.Concatenate([0], [1]) is incorrect, is %v, but expected 01",
@@ -41,15 +41,15 @@ func TestEmptyConcatenateLen1(t *testing.T) {
 
 //TestConcatenateLess64 tests function Concatenate for vectors of length less than 64
 func TestConcatenateLess64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0,
     })
-    w, _ := New([]uint8{
+    w := New([]uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
     })
-    res, _ := New([]uint8{
+    res := New([]uint8{
         0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -64,15 +64,15 @@ func TestConcatenateLess64(t *testing.T) {
 
 //TestConcatenate64 tests function Concatenate for vectors of length 64
 func TestConcatenate64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0,
     })
-    w, _ := New([]uint8{
+    w := New([]uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
     })
-    res, _ := New([]uint8{
+    res := New([]uint8{
         0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -87,7 +87,7 @@ func TestConcatenate64(t *testing.T) {
 
 //TestConcatenateMore64 tests function Concatenate for vectors of length more than 64
 func TestConcatenateMore64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -95,7 +95,7 @@ func TestConcatenateMore64(t *testing.T) {
         0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
-    w, _ := New([]uint8{
+    w := New([]uint8{
         0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
         0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
@@ -103,7 +103,7 @@ func TestConcatenateMore64(t *testing.T) {
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
-    res, _ := New([]uint8{
+    res := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -126,13 +126,13 @@ func TestConcatenateMore64(t *testing.T) {
 
 //TestConcatenateMore64SmallLast1 tests function Concatenate for vectors of length more than 64
 func TestConcatenateMore64SmallLast1(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
         0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1,
     })
-    w, _ := New([]uint8{
+    w := New([]uint8{
         0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
         0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
@@ -140,7 +140,7 @@ func TestConcatenateMore64SmallLast1(t *testing.T) {
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
-    res, _ := New([]uint8{
+    res := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -161,16 +161,16 @@ func TestConcatenateMore64SmallLast1(t *testing.T) {
 
 //TestConcatenateMore64SmallLast2 tests function Concatenate for vectors of length more than 64
 func TestConcatenateMore64SmallLast2(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
         0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1,
     })
-    w, _ := New([]uint8{
+    w := New([]uint8{
         0, 1, 1, 0, 1, 1,
     })
-    res, _ := New([]uint8{
+    res := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,

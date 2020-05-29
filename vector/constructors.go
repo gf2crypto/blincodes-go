@@ -4,19 +4,19 @@ import "strings"
 import "fmt"
 
 // New creates vector object
-func New(body interface{}) (*Vector, error) {
+func New(body interface{}) *Vector {
     switch b := body.(type) {
     case nil:
-        return newEmpty(0), nil
+        return newEmpty(0)
     case string:
         return newFromString(&b)
     case int:
-        return newEmpty(b), nil
+        return newEmpty(b)
     default:
         {
             slice, e := ToSlicer(b)
             if e != nil {
-                return nil, fmt.Errorf("vector: unsupported type %T, supported only: [](u)int(8,16, 32, 64), (u)int, string, nil", b)
+                panic(fmt.Errorf("vector: unsupported type %T, supported only: [](u)int(8,16, 32, 64), (u)int, string, nil", b))
             }
             v := newEmpty(slice.Len())
             for i := 0; i < slice.Len(); i++ {
@@ -24,11 +24,11 @@ func New(body interface{}) (*Vector, error) {
                 case bit == 1:
                     v.body[i/wordSize] ^= (1 << (wordSize - (i % wordSize) - 1))
                 case bit != 0:
-                    return nil, fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
-                        bit, i)
+                    panic(fmt.Errorf("vector: unexpected digit %d in position %d, possible only {0, 1}",
+                        bit, i))
                 }
             }
-            return v, nil
+            return v
         }
     }
 }
@@ -38,9 +38,9 @@ func New(body interface{}) (*Vector, error) {
 //       '0' == '0', '-'
 // Example:
 //   "--110-1- - - 1-   0 " -> 0011001000100
-func newFromString(s *string) (*Vector, error) {
+func newFromString(s *string) *Vector {
     if len(*s) == 0 {
-        return newEmpty(0), nil
+        return newEmpty(0)
     }
     // len > 0
     // remove all white spaces
@@ -54,10 +54,10 @@ func newFromString(s *string) (*Vector, error) {
         default:
             e := fmt.Errorf("vector: parse string %s error, unexpected symbol %c in position %d, possible only {' ', '0', '1', '-'}",
                 tmp, bit, i)
-            return nil, e
+            panic(e)
         }
     }
-    return v, nil
+    return v
 }
 
 func newEmpty(n int) *Vector {

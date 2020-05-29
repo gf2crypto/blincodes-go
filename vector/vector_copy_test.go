@@ -6,7 +6,7 @@ import (
 
 //TestCopyNil tests function Copy for nil vector
 func TestCopyNil(t *testing.T) {
-    v, _ := New(nil)
+    v := New(nil)
     w := v.Copy()
     if !w.Equal(v) {
         t.Errorf("vector testing: Copy() is incorrect, %v != %v",
@@ -16,7 +16,7 @@ func TestCopyNil(t *testing.T) {
 
 //TestCopyEmpty tests function Copy for empty vector
 func TestCopyEmpty(t *testing.T) {
-    v, _ := New([]uint8{})
+    v := New([]uint8{})
     w := v.Copy()
     if !w.Equal(v) {
         t.Errorf("vector testing: Copy() is incorrect, %v != %v",
@@ -26,7 +26,7 @@ func TestCopyEmpty(t *testing.T) {
 
 //TestCopyLen1 tests function Copy for vector of length 1
 func TestCopyLen1(t *testing.T) {
-    v, _ := New([]uint8{0})
+    v := New([]uint8{0})
     w := v.Copy()
     if !w.Equal(v) {
         t.Errorf("vector testing: Copy() is incorrect, %v != %v",
@@ -36,7 +36,7 @@ func TestCopyLen1(t *testing.T) {
 
 //TestCopyLenLess64 tests function Copy for vector of length less than 64
 func TestCopyLenLess64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
@@ -49,7 +49,7 @@ func TestCopyLenLess64(t *testing.T) {
 
 //TestCopyLen64 tests function Copy for vector of length 64
 func TestCopyLen64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -64,7 +64,7 @@ func TestCopyLen64(t *testing.T) {
 
 //TestCopyLenMore64 tests function Copy for vector of length more than 64
 func TestCopyLenMore64(t *testing.T) {
-    v, _ := New([]uint8{
+    v := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,

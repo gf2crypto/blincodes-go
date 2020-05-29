@@ -6,8 +6,8 @@ import (
 
 //TestNotNil tests function NOT for nil vector
 func TestNotNil(t *testing.T) {
-    v, _ := New(nil)
-    res, _ := New(nil)
+    v := New(nil)
+    res := New(nil)
     v = v.Not()
     if !v.Equal(res) {
         t.Errorf("vector testing: NOT nil is incorrect, NOT nil != nil, but %v",
@@ -17,8 +17,8 @@ func TestNotNil(t *testing.T) {
 
 //TestNotEmpty tests function Not of empty vector
 func TestNotEmpty(t *testing.T) {
-    v, _ := New([]uint8{})
-    res, _ := New(nil)
+    v := New([]uint8{})
+    res := New(nil)
     v = v.Not()
     if !v.Equal(res) {
         t.Errorf("vector testing: Not empty is incorrect, Not empty != nil, but %v",
@@ -28,11 +28,11 @@ func TestNotEmpty(t *testing.T) {
 
 //TestNotLess64 tests function Not for vectors of length less than 64
 func TestNotLess64(t *testing.T) {
-    u, _ := New([]uint8{
+    u := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     })
-    res, _ := New([]uint8{
+    res := New([]uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
     })
@@ -45,13 +45,13 @@ func TestNotLess64(t *testing.T) {
 
 //TestNot64 tests function Not for vectors of length 64
 func TestNot64(t *testing.T) {
-    u, _ := New([]uint8{
+    u := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
         0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
     })
-    res, _ := New([]uint8{
+    res := New([]uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0,
@@ -66,7 +66,7 @@ func TestNot64(t *testing.T) {
 
 //TestNotMore64 tests function Not for vectors of length more than 64
 func TestNotMore64(t *testing.T) {
-    u, _ := New([]uint8{
+    u := New([]uint8{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -74,7 +74,7 @@ func TestNotMore64(t *testing.T) {
         0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
         0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     })
-    res, _ := New([]uint8{
+    res := New([]uint8{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0,
