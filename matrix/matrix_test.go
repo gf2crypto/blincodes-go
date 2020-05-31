@@ -1,0 +1,200 @@
+package matrix
+
+import "testing"
+
+var matricies = [](func() (*Matrix, *Matrix, *Matrix, int)){
+    newZero,
+    newUpper,
+    newRank1,
+    newMaxRank,
+    newMaxRankLong,
+    newNonMaxRankSquare,
+    newNonMaxRankLong,
+}
+
+//TestEvaluatiotEchelonForm test the evaluation of Matrix echelon form
+func TestEvaluatiotEchelonForm(t *testing.T) {
+    for _, m := range matricies {
+        mat, echelon, _, _ := m()
+        if !echelon.Equal(mat.Echelon()) {
+            t.Errorf("%v != %v", mat.Echelon(), echelon)
+        }
+    }
+}
+
+//TestEvaluatiotDiagonalForm test the evaluation of Matrix diagonal form
+func TestEvaluatiotDiagonalForm(t *testing.T) {
+    for _, m := range matricies {
+        mat, _, diag, _ := m()
+        if !diag.Equal(mat.Diagonal()) {
+            t.Errorf("%v != %v", mat.Diagonal(), diag)
+        }
+    }
+}
+
+//TestEvaluatiotRank test the evaluation of Matrix's rank
+func TestEvaluatiotRank(t *testing.T) {
+    for _, m := range matricies {
+        mat, _, _, rank := m()
+        if mat.Rank() != rank {
+            t.Errorf("%v.Rank() = %v, but got %v", mat, mat.Rank(), rank)
+        }
+    }
+}
+
+func newUpper() (*Matrix, *Matrix, *Matrix, int) {
+    body := []uint8{
+        1, 1, 1, 1,
+        0, 1, 1, 1,
+        0, 0, 1, 1,
+        0, 0, 0, 1,
+    }
+    diag := []uint8{
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1,
+    }
+    return New(4, body), New(4, body), New(4, diag), 4
+}
+
+func newMaxRank() (*Matrix, *Matrix, *Matrix, int) {
+    body := []uint8{
+        0, 1, 1, 1,
+        1, 0, 0, 0,
+        1, 1, 0, 0,
+        1, 1, 1, 0,
+    }
+    echelon := []uint8{
+        1, 0, 0, 0,
+        0, 1, 1, 1,
+        0, 0, 1, 1,
+        0, 0, 0, 1,
+    }
+    diag := []uint8{
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1,
+    }
+    return New(4, body), New(4, echelon), New(4, diag), 4
+}
+
+func newNonMaxRankSquare() (*Matrix, *Matrix, *Matrix, int) {
+    body := []uint8{
+        0, 1, 1, 1, 0,
+        0, 0, 1, 0, 1,
+        1, 1, 0, 0, 1,
+        1, 1, 1, 0, 0,
+    }
+    echelon := []uint8{
+        1, 0, 0, 1, 0,
+        0, 1, 1, 1, 0,
+        0, 0, 1, 0, 1,
+        0, 0, 0, 0, 0,
+    }
+    diag := []uint8{
+        1, 0, 0, 1, 0,
+        0, 1, 0, 1, 1,
+        0, 0, 1, 0, 1,
+        0, 0, 0, 0, 0,
+    }
+    return New(4, body), New(4, echelon), New(4, diag), 3
+}
+
+func newMaxRankLong() (*Matrix, *Matrix, *Matrix, int) {
+    body := []uint8{
+        0, 1, 1, 1, 0,
+        0, 0, 1, 0, 1,
+        1, 1, 0, 0, 1,
+        1, 1, 1, 0, 0,
+        1, 0, 0, 1, 0,
+        1, 1, 1, 1, 1,
+        0, 1, 0, 1, 0,
+    }
+    echelon := []uint8{
+        1, 0, 0, 1, 0,
+        0, 1, 1, 1, 0,
+        0, 0, 1, 0, 1,
+        0, 0, 0, 1, 1,
+        0, 0, 0, 0, 1,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+    }
+    diag := []uint8{
+        1, 0, 0, 0, 0,
+        0, 1, 0, 0, 0,
+        0, 0, 1, 0, 0,
+        0, 0, 0, 1, 0,
+        0, 0, 0, 0, 1,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+    }
+    return New(7, body), New(7, echelon), New(7, diag), 5
+}
+
+func newZero() (*Matrix, *Matrix, *Matrix, int) {
+    body := []uint8{
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+    }
+    return New(7, body), New(7, body), New(7, body), 0
+}
+
+func newRank1() (*Matrix, *Matrix, *Matrix, int) {
+    body := []uint8{
+        0, 1, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 1, 0, 0, 0,
+        0, 0, 0, 0, 0,
+    }
+    echelon := []uint8{
+        0, 1, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+    }
+    return New(7, body), New(7, echelon), New(7, echelon), 1
+}
+
+func newNonMaxRankLong() (*Matrix, *Matrix, *Matrix, int) {
+    body := []uint8{
+        0, 1, 1, 1, 0, 0,
+        0, 0, 1, 0, 1, 0,
+        1, 1, 0, 0, 1, 0,
+        1, 1, 1, 0, 0, 0,
+        1, 0, 0, 1, 0, 0,
+        1, 1, 1, 1, 1, 0,
+        0, 1, 0, 1, 0, 0,
+    }
+    echelon := []uint8{
+        1, 0, 0, 1, 0, 0,
+        0, 1, 1, 1, 0, 0,
+        0, 0, 1, 0, 1, 0,
+        0, 0, 0, 1, 1, 0,
+        0, 0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+    }
+    diag := []uint8{
+        1, 0, 0, 0, 0, 0,
+        0, 1, 0, 0, 0, 0,
+        0, 0, 1, 0, 0, 0,
+        0, 0, 0, 1, 0, 0,
+        0, 0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+    }
+    return New(7, body), New(7, echelon), New(7, diag), 5
+}

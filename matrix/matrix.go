@@ -53,6 +53,31 @@ func (mat *Matrix) Shapes() (int, int) {
     return mat.Nrows(), mat.Ncolumns()
 }
 
+//Rank returns rank of Matrix
+func (mat *Matrix) Rank() int {
+    rank := 0
+    echelon := mat.Copy()
+    for i, row := range echelon.body {
+        firstOne := -1
+        for j := 0; j < mat.Ncolumns(); j++ {
+            if row.Get(j) != 0 {
+                firstOne = j
+                break
+            }
+        }
+        if firstOne < 0 {
+            continue
+        }
+        rank++
+        for k := i + 1; k < mat.Nrows(); k++ {
+            if echelon.body[k].Get(firstOne) != 0 {
+                echelon.body[k] = row.Xor(echelon.body[k])
+            }
+        }
+    }
+    return rank
+}
+
 //Echelon returns echelon form of Matrix
 func (mat *Matrix) Echelon() *Matrix {
     if mat.Nrows() == 0 || mat.Ncolumns() == 0 {
@@ -78,6 +103,33 @@ func (mat *Matrix) Echelon() *Matrix {
     }
     sort.Slice(echelon.body, func(i, j int) bool { return echelon.body[j].Less(echelon.body[i]) })
     return echelon
+}
+
+//Diagonal returns diagonal form of Matrix
+func (mat *Matrix) Diagonal() *Matrix {
+    if mat.Nrows() == 0 || mat.Ncolumns() == 0 {
+        return newEmpty(0, 0)
+    }
+    diag := mat.Copy()
+    for i, row := range diag.body {
+        firstOne := -1
+        for j := 0; j < mat.Ncolumns(); j++ {
+            if row.Get(j) != 0 {
+                firstOne = j
+                break
+            }
+        }
+        if firstOne < 0 {
+            continue
+        }
+        for k := 0; k < mat.Nrows(); k++ {
+            if (k != i) && (diag.body[k].Get(firstOne) != 0) {
+                diag.body[k] = row.Xor(diag.body[k])
+            }
+        }
+    }
+    sort.Slice(diag.body, func(i, j int) bool { return diag.body[j].Less(diag.body[i]) })
+    return diag
 }
 
 //Copy copies matrix
