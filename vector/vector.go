@@ -74,6 +74,102 @@ func (v *Vector) Equal(v0 *Vector) bool {
     return true
 }
 
+//Less return true if vector v is less vector v0
+//Return v < v0?
+func (v *Vector) Less(v0 *Vector) bool {
+    if v.Len() < v0.Len() {
+        return true
+    }
+    if v.Len() > v0.Len() {
+        return false
+    }
+    if v.Len() != 0 {
+        for i, b := range v.body {
+            switch {
+            case b < v0.body[i]:
+                return true
+            case b > v0.body[i]:
+                return false
+            default:
+                continue
+            }
+        }
+    }
+    return false
+}
+
+//More return true if vector v is more vector v0
+//Return v > v0?
+func (v *Vector) More(v0 *Vector) bool {
+    if v.Len() < v0.Len() {
+        return false
+    }
+    if v.Len() > v0.Len() {
+        return true
+    }
+    if v.Len() != 0 {
+        for i, b := range v.body {
+            switch {
+            case b < v0.body[i]:
+                return false
+            case b > v0.body[i]:
+                return true
+            default:
+                continue
+            }
+        }
+    }
+    return false
+}
+
+//NoMore return true if vector v is no more vector v0
+//Return v <= v0?
+func (v *Vector) NoMore(v0 *Vector) bool {
+    if v.Len() < v0.Len() {
+        return true
+    }
+    if v.Len() > v0.Len() {
+        return false
+    }
+    if v.Len() != 0 {
+        for i, b := range v.body {
+            switch {
+            case b < v0.body[i]:
+                return true
+            case b > v0.body[i]:
+                return false
+            default:
+                continue
+            }
+        }
+    }
+    return true
+}
+
+//NoLess return true if vector v is no less vector v0
+//Return v >= v0?
+func (v *Vector) NoLess(v0 *Vector) bool {
+    if v.Len() < v0.Len() {
+        return false
+    }
+    if v.Len() > v0.Len() {
+        return true
+    }
+    if v.Len() != 0 {
+        for i, b := range v.body {
+            switch {
+            case b < v0.body[i]:
+                return false
+            case b > v0.body[i]:
+                return true
+            default:
+                continue
+            }
+        }
+    }
+    return true
+}
+
 // Copy returns copy of vector
 func (v *Vector) Copy() *Vector {
     return &Vector{
