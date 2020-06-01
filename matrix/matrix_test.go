@@ -42,6 +42,25 @@ func TestEvaluatiotRank(t *testing.T) {
     }
 }
 
+//TestOrthogonal test the evaluation of Matrix's rank
+func TestOrthogonal(t *testing.T) {
+    for _, m := range matricies {
+        mat, _, _, rank := m()
+        orth := mat.Orthogonal()
+        orthT := orth.T()
+        mul := mat.Mul(orthT)
+        res := New(mat.Nrows(), mat.Ncolumns()-rank)
+        if mat.Ncolumns() == rank {
+            res = New(mat.Nrows(), 1)
+        }
+        eq := mul.Equal(res)
+        if !eq {
+            t.Errorf("GH^T != 0, mat:\n%v,\northogonal:\n%v,\northogonal^T:\n%v,\nbut GH^T=\n%v\nexpected=\n%v",
+                mat, orth, orthT, mul, res)
+        }
+    }
+}
+
 func newUpper() (*Matrix, *Matrix, *Matrix, int) {
     body := []uint8{
         1, 1, 1, 1,
