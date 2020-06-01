@@ -12,6 +12,15 @@ var matricies = [](func() (*Matrix, *Matrix, *Matrix, int)){
     newNonMaxRankLong,
 }
 
+var randomArgs = []([2]int){
+    [2]int{10, 10},
+    [2]int{100, 100},
+    [2]int{10, 20},
+    [2]int{100, 200},
+    [2]int{20, 10},
+    [2]int{200, 100},
+}
+
 //TestEvaluatiotEchelonForm test the evaluation of Matrix echelon form
 func TestEvaluatiotEchelonForm(t *testing.T) {
     for _, m := range matricies {
@@ -61,10 +70,47 @@ func TestOrthogonal(t *testing.T) {
     }
 }
 
+//TestRandomOrthogonal test the evaluation of orthogonal matrix for random matrix
+func TestRandomOrthogonal(t *testing.T) {
+    for _, arg := range randomArgs {
+        matArray, _ := makeRandomMatrix(arg[0], arg[1])
+        mat := New(arg[0], matArray)
+        rank := mat.Rank()
+        orth := mat.Orthogonal()
+        orthT := orth.T()
+        mul := mat.Mul(orthT)
+        res := New(mat.Nrows(), mat.Ncolumns()-rank)
+        if mat.Ncolumns() == rank {
+            res = New(mat.Nrows(), 1)
+        }
+        eq := mul.Equal(res)
+        if !eq {
+            t.Errorf("GH^T != 0, mat:\n%v,\northogonal:\n%v,\northogonal^T:\n%v,\nbut GH^T=\n%v\nexpected=\n%v",
+                mat, orth, orthT, mul, res)
+        }
+    }
+}
+
 //TestInv test the evaluation of generalized inverse of Matrix
 func TestInv(t *testing.T) {
     for _, m := range matricies {
         mat, _, _, _ := m()
+        inv := mat.Inv()
+        mul := inv.Mul(mat)
+        res := mat.Diagonal()
+        eq := mul.Equal(res)
+        if !eq {
+            t.Errorf("G^{-1}*G != E, mat:\n%v,\nG^{-1}:\n%v,\nbut G^{-1}*G=\n%v\nexpected=\n%v",
+                mat, inv, mul, res)
+        }
+    }
+}
+
+//TestRandomInv test the evaluation of generalized inverse for random matrix
+func TestRandomInv(t *testing.T) {
+    for _, arg := range randomArgs {
+        matArray, _ := makeRandomMatrix(arg[0], arg[1])
+        mat := New(arg[0], matArray)
         inv := mat.Inv()
         mul := inv.Mul(mat)
         res := mat.Diagonal()
