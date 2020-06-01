@@ -61,6 +61,21 @@ func TestOrthogonal(t *testing.T) {
     }
 }
 
+//TestInv test the evaluation of generalized inverse of Matrix
+func TestInv(t *testing.T) {
+    for _, m := range matricies {
+        mat, _, _, _ := m()
+        inv := mat.Inv()
+        mul := inv.Mul(mat)
+        res := mat.Diagonal()
+        eq := mul.Equal(res)
+        if !eq {
+            t.Errorf("G^{-1}*G != E, mat:\n%v,\nG^{-1}:\n%v,\nbut G^{-1}*G=\n%v\nexpected=\n%v",
+                mat, inv, mul, res)
+        }
+    }
+}
+
 func newUpper() (*Matrix, *Matrix, *Matrix, int) {
     body := []uint8{
         1, 1, 1, 1,

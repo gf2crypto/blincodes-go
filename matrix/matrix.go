@@ -104,6 +104,37 @@ func (mat *Matrix) Orthogonal() *Matrix {
     return (&Matrix{body: body, ncolumns: mat.Ncolumns() - len(iw)}).T()
 }
 
+//Inv evaluates generalized inverse of matrix
+func (mat *Matrix) Inv() *Matrix {
+    m := make([]([2](*vector.Vector)), mat.Nrows())
+    mIdent := Identity(mat.Nrows())
+    for i, row := range mat.body {
+        m[i] = [2](*vector.Vector){row.Copy(), mIdent.body[i]}
+    }
+    for i, rows := range m {
+        firstOne := -1
+        for j := 0; j < mat.Ncolumns(); j++ {
+            if rows[0].Get(j) != 0 {
+                firstOne = j
+                break
+            }
+        }
+        if firstOne < 0 {
+            continue
+        }
+        for k := 0; k < mat.Nrows(); k++ {
+            if (k != i) && (m[k][0].Get(firstOne) != 0) {
+                m[k][0], m[k][1] = rows[0].Xor(m[k][0]), rows[1].Xor(m[k][1])
+            }
+        }
+    }
+    sort.Slice(m, func(i, j int) bool { return m[j][0].Less(m[i][0]) })
+    for i := 0; i < mat.Nrows(); i++ {
+        mIdent.body[i] = m[i][1]
+    }
+    return mIdent
+}
+
 //GaussElim evaluates Gaussian elimination
 // GaussElim(full=false) -> classic, only forward
 // GaussElim(full=true) -> forward and reverse
