@@ -2,7 +2,7 @@ package matrix
 
 import "testing"
 
-var matricies = [](func() (*Matrix, *Matrix, *Matrix, int)){
+var matrices = [](func() (*Matrix, *Matrix, *Matrix, int)){
     newZero,
     newUpper,
     newRank1,
@@ -23,7 +23,7 @@ var randomArgs = []([2]int){
 
 //TestEvaluatiotEchelonForm test the evaluation of Matrix echelon form
 func TestEvaluatiotEchelonForm(t *testing.T) {
-    for _, m := range matricies {
+    for _, m := range matrices {
         mat, echelon, _, _ := m()
         if !echelon.Equal(mat.Echelon()) {
             t.Errorf("%v != %v", mat.Echelon(), echelon)
@@ -33,7 +33,7 @@ func TestEvaluatiotEchelonForm(t *testing.T) {
 
 //TestEvaluatiotDiagonalForm test the evaluation of Matrix diagonal form
 func TestEvaluatiotDiagonalForm(t *testing.T) {
-    for _, m := range matricies {
+    for _, m := range matrices {
         mat, _, diag, _ := m()
         if !diag.Equal(mat.Diagonal()) {
             t.Errorf("%v != %v", mat.Diagonal(), diag)
@@ -43,7 +43,7 @@ func TestEvaluatiotDiagonalForm(t *testing.T) {
 
 //TestEvaluatiotRank test the evaluation of Matrix's rank
 func TestEvaluatiotRank(t *testing.T) {
-    for _, m := range matricies {
+    for _, m := range matrices {
         mat, _, _, rank := m()
         if mat.Rank() != rank {
             t.Errorf("%v.Rank() = %v, but got %v", mat, mat.Rank(), rank)
@@ -51,9 +51,9 @@ func TestEvaluatiotRank(t *testing.T) {
     }
 }
 
-//TestOrthogonal test the evaluation of Matrix's rank
+//TestOrthogonal test the evaluation orthogonal matrix
 func TestOrthogonal(t *testing.T) {
-    for _, m := range matricies {
+    for _, m := range matrices {
         mat, _, _, rank := m()
         orth := mat.Orthogonal()
         orthT := orth.T()
@@ -93,7 +93,7 @@ func TestRandomOrthogonal(t *testing.T) {
 
 //TestInv test the evaluation of generalized inverse of Matrix
 func TestInv(t *testing.T) {
-    for _, m := range matricies {
+    for _, m := range matrices {
         mat, _, _, _ := m()
         inv := mat.Inv()
         mul := inv.Mul(mat)
