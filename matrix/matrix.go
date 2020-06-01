@@ -55,80 +55,19 @@ func (mat *Matrix) Shapes() (int, int) {
 
 //Rank returns rank of Matrix
 func (mat *Matrix) Rank() int {
-    rank := 0
-    echelon := mat.Copy()
-    for i, row := range echelon.body {
-        firstOne := -1
-        for j := 0; j < mat.Ncolumns(); j++ {
-            if row.Get(j) != 0 {
-                firstOne = j
-                break
-            }
-        }
-        if firstOne < 0 {
-            continue
-        }
-        rank++
-        for k := i + 1; k < mat.Nrows(); k++ {
-            if echelon.body[k].Get(firstOne) != 0 {
-                echelon.body[k] = row.Xor(echelon.body[k])
-            }
-        }
-    }
-    return rank
+    _, iw := mat.GaussElim(false)
+    return len(iw)
 }
 
 //Echelon returns echelon form of Matrix
 func (mat *Matrix) Echelon() *Matrix {
-    if mat.Nrows() == 0 || mat.Ncolumns() == 0 {
-        return newEmpty(0, 0)
-    }
-    echelon := mat.Copy()
-    for i, row := range echelon.body {
-        firstOne := -1
-        for j := 0; j < mat.Ncolumns(); j++ {
-            if row.Get(j) != 0 {
-                firstOne = j
-                break
-            }
-        }
-        if firstOne < 0 {
-            continue
-        }
-        for k := i + 1; k < mat.Nrows(); k++ {
-            if echelon.body[k].Get(firstOne) != 0 {
-                echelon.body[k] = row.Xor(echelon.body[k])
-            }
-        }
-    }
-    sort.Slice(echelon.body, func(i, j int) bool { return echelon.body[j].Less(echelon.body[i]) })
-    return echelon
+    ech, _ := mat.GaussElim(false)
+    return ech
 }
 
 //Diagonal returns diagonal form of Matrix
 func (mat *Matrix) Diagonal() *Matrix {
-    if mat.Nrows() == 0 || mat.Ncolumns() == 0 {
-        return newEmpty(0, 0)
-    }
-    diag := mat.Copy()
-    for i, row := range diag.body {
-        firstOne := -1
-        for j := 0; j < mat.Ncolumns(); j++ {
-            if row.Get(j) != 0 {
-                firstOne = j
-                break
-            }
-        }
-        if firstOne < 0 {
-            continue
-        }
-        for k := 0; k < mat.Nrows(); k++ {
-            if (k != i) && (diag.body[k].Get(firstOne) != 0) {
-                diag.body[k] = row.Xor(diag.body[k])
-            }
-        }
-    }
-    sort.Slice(diag.body, func(i, j int) bool { return diag.body[j].Less(diag.body[i]) })
+    diag, _ := mat.GaussElim(true)
     return diag
 }
 
@@ -140,51 +79,89 @@ func (mat *Matrix) Orthogonal() *Matrix {
     if mat.Nrows() == 0 || mat.Ncolumns() == 0 {
         return newEmpty(0, 0)
     }
-    diag := mat.Copy()
-    // identityIndexes - list of indexes which corresponding identity matrix
-    // G = (I|A)
-    identityIndexes := make([]int, 0, diag.Ncolumns())
-    // Make Gaussian elimination
-    for i, row := range diag.body {
-        firstOne := -1
-        for j := 0; j < mat.Ncolumns(); j++ {
-            if row.Get(j) != 0 {
-                firstOne = j
-                break
-            }
-        }
-        if firstOne < 0 {
-            continue
-        }
-        identityIndexes = append(identityIndexes, firstOne)
-        for k := 0; k < mat.Nrows(); k++ {
-            if (k != i) && (diag.body[k].Get(firstOne) != 0) {
-                diag.body[k] = row.Xor(diag.body[k])
-            }
-        }
-    }
-    if len(identityIndexes) == mat.Ncolumns() {
+    diag, iw := mat.GaussElim(true)
+    if len(iw) == mat.Ncolumns() {
         return New(1, mat.Ncolumns())
     }
     sort.Slice(diag.body, func(i, j int) bool { return diag.body[j].Less(diag.body[i]) })
-    sort.Slice(identityIndexes, func(i, j int) bool { return identityIndexes[i] < identityIndexes[j] })
-    matGIndexes := make([]int, 0, mat.Ncolumns()-len(identityIndexes))
+    sort.Slice(iw, func(i, j int) bool { return iw[i] < iw[j] })
+    matGIndexes := make([]int, 0, mat.Ncolumns()-len(iw))
     for i := 0; i < mat.Ncolumns(); i++ {
-        j := sort.SearchInts(identityIndexes, i)
-        if j >= len(identityIndexes) || (identityIndexes[j] != i) {
+        j := sort.SearchInts(iw, i)
+        if j >= len(iw) || (iw[j] != i) {
             matGIndexes = append(matGIndexes, i)
         }
     }
-    matG := (&Matrix{body: diag.body[:len(identityIndexes)], ncolumns: diag.ncolumns}).Submatrix(matGIndexes)
-    matI := Identity(mat.Ncolumns() - len(identityIndexes))
+    matG := (&Matrix{body: diag.body[:len(iw)], ncolumns: diag.ncolumns}).Submatrix(matGIndexes)
+    matI := Identity(mat.Ncolumns() - len(iw))
     body := make([](*vector.Vector), mat.Ncolumns())
-    for i, ind := range identityIndexes {
+    for i, ind := range iw {
         body[ind] = matG.body[i]
     }
     for i, ind := range matGIndexes {
         body[ind] = matI.body[i]
     }
-    return (&Matrix{body: body, ncolumns: mat.Ncolumns() - len(identityIndexes)}).T()
+    return (&Matrix{body: body, ncolumns: mat.Ncolumns() - len(iw)}).T()
+}
+
+//GaussElim evaluates Gaussian elimination
+// GaussElim(full=false) -> classic, only forward
+// GaussElim(full=true) -> forward and reverse
+// GaussElim(full bool, edge int) -> only for columns with numbers < edge
+// GaussElim(full bool, columns []int) -> only for columns from input slice
+//Return:
+//     *Matrix - result of elimination
+//     []int - information window, i.e. positions of maximum rank submatrix
+func (mat *Matrix) GaussElim(full bool, limit ...interface{}) (*Matrix, []int) {
+    if mat.Nrows() == 0 || mat.Ncolumns() == 0 {
+        return newEmpty(0, 0), make([]int, 0)
+    }
+    var lim interface{}
+    if len(limit) >= 2 {
+        panic(fmt.Errorf("matrix: GaussElim expected no more 2 arguments, but got %v", len(limit)))
+    }
+    if len(limit) == 0 {
+        lim = mat.Ncolumns()
+    } else {
+        lim = limit[0]
+    }
+    res := mat.Copy()
+    infoWindow := make([]int, 0, mat.Ncolumns())
+    for i, row := range res.body {
+        firstOne := -1
+        switch l := lim.(type) {
+        case int:
+            for j := 0; j < l; j++ {
+                if row.Get(j) != 0 {
+                    firstOne = j
+                    break
+                }
+            }
+        case []int:
+            for _, j := range l {
+                if row.Get(j) != 0 {
+                    firstOne = j
+                    break
+                }
+            }
+        }
+        if firstOne < 0 {
+            continue
+        }
+        infoWindow = append(infoWindow, firstOne)
+        start := 0
+        if !full {
+            start = i + 1
+        }
+        for k := start; k < mat.Nrows(); k++ {
+            if (k != i) && (res.body[k].Get(firstOne) != 0) {
+                res.body[k] = row.Xor(res.body[k])
+            }
+        }
+    }
+    sort.Slice(res.body, func(i, j int) bool { return res.body[j].Less(res.body[i]) })
+    sort.Slice(infoWindow, func(i, j int) bool { return infoWindow[i] < infoWindow[j] })
+    return res, infoWindow
 }
 
 //Copy copies matrix
