@@ -82,6 +82,23 @@ func New(params ...interface{}) *Matrix {
     return &Matrix{body: body, ncolumns: ncolumns}
 }
 
+//Identity creates identity matrix of size n
+func Identity(n int) *Matrix {
+    if n <= 0 {
+        return newEmpty(0, 0)
+    }
+    row := make([]uint8, n)
+    body := make([](*vector.Vector), 0, n)
+    for i := 0; i < n; i++ {
+        if i > 0 {
+            row[i-1] = 0
+        }
+        row[i] = 1
+        body = append(body, vector.New(row))
+    }
+    return &Matrix{body: body, ncolumns: n}
+}
+
 // newFromStrings converts array string to Matrix
 // Function supports the following filler for zero symbol:
 //       '0' == '0', '-'
