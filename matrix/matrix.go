@@ -212,11 +212,7 @@ func (mat *Matrix) T() *Matrix {
     body := make([](*vector.Vector), 0, mat.Ncolumns())
     // fmt.Printf("debug: ncolumns=%v,matrix:\n%v\n", mat.Ncolumns(), mat)
     for j := 0; j < mat.Ncolumns(); j++ {
-        row := make([]uint8, 0, mat.Ncolumns())
-        for i := 0; i < mat.Nrows(); i++ {
-            row = append(row, uint8(mat.body[i].Get(j)))
-        }
-        body = append(body, vector.New(row))
+        body = append(body, mat.GetColumn(j))
     }
     return &Matrix{body: body, ncolumns: mat.Nrows()}
 }
@@ -306,4 +302,52 @@ func (mat *Matrix) Equal(mat0 *Matrix) bool {
         }
     }
     return true
+}
+
+//GetRow returns i-th row
+func (mat *Matrix) GetRow(i int) *vector.Vector {
+    if (mat.Nrows() <= i) || (i < 0) {
+        panic(fmt.Errorf("matrix: index row %v out of range, expected %v <= i <= %v",
+            i, 0, mat.Nrows()-1))
+    }
+    return mat.body[i]
+}
+
+//GetColumn returns copy of i-th column
+func (mat *Matrix) GetColumn(i int) *vector.Vector {
+    if (mat.Ncolumns() <= i) || (i < 0) {
+        panic(fmt.Errorf("matrix: index column %v out of range, expected %v <= i <= %v",
+            i, 0, mat.Ncolumns()-1))
+    }
+    row := make([]uint8, 0, mat.Nrows())
+    for j := 0; j < mat.Nrows(); j++ {
+        row = append(row, uint8(mat.body[j].Get(i)))
+    }
+    return vector.New(row)
+}
+
+//Solve solves linear equation Ax^T=b^T
+func (mat *Matrix) Solve(v *vector.Vector) ([](*vector.Vector), *vector.Vector) {
+    if mat.Nrows() != v.Len() {
+        panic(fmt.Errorf("matrix: cannot solve equation, wrong dimension, expected length of vector equal to number of matrix rows, %v!=%v",
+            v.Len(), mat.Nrows()))
+    }
+    extended := mat.ConcatenateColumns((&Matrix{body: [](*vector.Vector){v}, ncolumns: v.Len()}).T())
+    orth := extended.Orthogonal()
+    fund := make([](*vector.Vector), 0, orth.Nrows()-1)
+    var sol *vector.Vector
+    for _, row := range orth.body {
+        if row.Get(row.Len()-1) == 0 {
+            fund = append(fund, row.Resize(-1))
+        } else {
+            if sol != nil {
+                return [](*vector.Vector){}, nil
+            }
+            sol = row.Resize(-1)
+        }
+    }
+    if sol == nil {
+        return [](*vector.Vector){}, nil
+    }
+    return fund, sol
 }
