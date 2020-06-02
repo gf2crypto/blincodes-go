@@ -318,6 +318,26 @@ func (v *Vector) Concatenate(v0 *Vector) *Vector {
     return &Vector{body: body, lenLast: v0.lenLast - r}
 }
 
+//Resize changes the length of vector
+//Resize(delta) sets length to v.Len() + delta.
+//That is if delta < 0 then vector is zip, and if delta > 0
+func (v *Vector) Resize(delta int) *Vector {
+    n := v.Len() + delta
+    if n <= 0 {
+        return newEmpty(0)
+    }
+    w := newEmpty(n)
+    end := len(w.body)
+    if end > len(v.body) {
+        end = len(v.body)
+    }
+    for i := 0; i < end; i++ {
+        w.body[i] = v.body[i]
+    }
+    w.body[len(w.body)-1] &= (((1 << w.lenLast) - 1) << (wordSize - w.lenLast))
+    return w
+}
+
 // set sets i-th bit of vector to value
 func (v *Vector) set(i int, val byte) *Vector {
     if i < 0 {
