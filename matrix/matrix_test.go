@@ -1,6 +1,7 @@
 package matrix
 
 import "testing"
+import "github.com/gf2crypto/blincodes-go/vector"
 
 var matrices = [](func() (*Matrix, *Matrix, *Matrix, int)){
     newZero,
@@ -119,6 +120,60 @@ func TestRandomInv(t *testing.T) {
             t.Errorf("G^{-1}*G != E, mat:\n%v,\nG^{-1}:\n%v,\nbut G^{-1}*G=\n%v\nexpected=\n%v",
                 mat, inv, mul, res)
         }
+    }
+}
+
+//TestSolveUniqeSol test the solving linear equations
+func TestSolveUniqeSol(t *testing.T) {
+    vec := vector.New([]uint8{1, 0, 1, 0})
+    mat, _, _, _ := newMaxRank()
+    fund, base := mat.Solve(vec)
+    if len(fund) != 0 {
+        t.Errorf("wrong fundamental system of equation %vx^T=(%v)^T, expected [], but got %v",
+            mat, vec, fund)
+    }
+    sol := &Matrix{body: [](*vector.Vector){base}, ncolumns: base.Len()}
+    b := &Matrix{body: [](*vector.Vector){vec}, ncolumns: vec.Len()}
+    if !mat.Mul(sol.T()).Equal(b.T()) {
+        t.Errorf("wrong base solution of equation %vx^T=(%v)^T: %v != %v:\n",
+            mat, vec, mat.Mul(sol.T()), b.T())
+    }
+}
+
+//TestSolveNoSol test the solving linear equations
+func TestSolveNoSol(t *testing.T) {
+    vec := vector.New([]uint8{1, 0, 1, 0})
+    mat, _, _, _ := newNonMaxRankSquare()
+    fund, base := mat.Solve(vec)
+    if len(fund) != 0 {
+        t.Errorf("wrong fundamental system of equation %vx^T=(%v)^T, expected [], but got %v",
+            mat, vec, fund)
+    }
+    if base != nil {
+        t.Errorf("wrong solution of equation %vx^T=(%v)^T, expected nil, but got %v:\n",
+            mat, vec, base)
+    }
+}
+
+// TestSolveMultSol test the solving linear equations
+func TestSolveMultSol(t *testing.T) {
+    vec := vector.New([]uint8{1, 1, 1, 0})
+    mat, _, _, _ := newNonMaxRankSquare()
+    fund, base := mat.Solve(vec)
+    if len(fund) != 2 {
+        t.Errorf("wrong dimension fundamental system of equation %vx^T=(%v)^T, expected 2, but got %v",
+            mat, vec, len(fund))
+    }
+    m := &Matrix{body: fund, ncolumns: fund[0].Len()}
+    if !mat.Mul(m.T()).Equal(New(4, 2)) {
+        t.Errorf("wrong fundamental system of equation %vx^T=(%v)^T, AF^T != 0:\n%v * %v^T !=0",
+            mat, vec, mat, m)
+    }
+    sol := &Matrix{body: [](*vector.Vector){base}, ncolumns: base.Len()}
+    b := &Matrix{body: [](*vector.Vector){vec}, ncolumns: vec.Len()}
+    if !mat.Mul(sol.T()).Equal(b.T()) {
+        t.Errorf("wrong base solution of equation %vx^T=(%v)^T: %v != %v:\n",
+            mat, vec, mat.Mul(sol.T()), b.T())
     }
 }
 
