@@ -3,6 +3,9 @@ package matrix
 import "github.com/gf2crypto/blincodes-go/vector"
 import "strings"
 import "fmt"
+import "math/rand"
+import "container/list"
+import "time"
 
 // New creates Matrix object
 // Parameters:
@@ -97,6 +100,81 @@ func Identity(n int) *Matrix {
         body = append(body, vector.New(row))
     }
     return &Matrix{body: body, ncolumns: n}
+}
+
+//Random returns random (m x n) - matrix.
+func Random(m int, n ...interface{}) *Matrix {
+    if m <= 0 {
+        return newEmpty(0, 0)
+    }
+    nc := m
+    if len(n) > 0 {
+        if t, ok := n[0].(int); ok {
+            nc = t
+        } else {
+            panic(fmt.Errorf("matrix: type error, expected number of columns is integer, not %T", n[0]))
+        }
+    }
+    if nc <= 0 {
+        return newEmpty(0, 0)
+    }
+    body := make([](*vector.Vector), 0, m)
+    for i := 0; i < m; i++ {
+        body = append(body, vector.Random(nc))
+    }
+    return &Matrix{body: body, ncolumns: nc}
+}
+
+//Nonsing returns nonsingular random matrix
+// Function uses algorithm of Dana Randall
+// https://www.researchgate.net/publication/2729950_Efficient_Generation_of_Random_Nonsingular_Matrices
+func Nonsing(n int) *Matrix {
+    if n <= 0 {
+        return newEmpty(0, 0)
+    }
+    rand.Seed(time.Now().UnixNano())
+    matA := make([]([]uint8), n)
+    for i := 0; i < n; i++ {
+        matA[i] = make([]uint8, n)
+    }
+    matT := make([](*vector.Vector), n)
+    cols := list.New()
+    for i := 0; i < n; i++ {
+        cols.PushBack(i)
+    }
+    for i := 0; i < n; i++ {
+        //Generate random v != 0
+        // And found its the first 1
+        v := make([]uint8, n)
+        r := cols.Front()
+        for isZero := true; isZero; {
+            for e := cols.Front(); e != nil; e.Next() {
+                v[e.Value.(int)] = uint8(rand.Intn(2))
+                if isZero && v[e.Value.(int)] != 0 {
+                    isZero = false
+                    r = e // index of the first 1
+                }
+            }
+        }
+        //Update matrix A
+        matA[i][r.Value.(int)] = 1
+        for j := i + 1; j < n; j++ {
+            matA[j][r.Value.(int)] = uint8(rand.Intn(2))
+        }
+        //Update matrix T
+        a := make([]uint8, n)
+        for e := cols.Front(); e != nil; e.Next() {
+            a[e.Value.(int)] = v[e.Value.(int)]
+        }
+        matT[r.Value.(int)] = vector.New(a)
+        cols.Remove(r)
+    }
+    bodyA := make([](*vector.Vector), n)
+    for i := 0; i < n; i++ {
+        bodyA[i] = vector.New(matA[i])
+    }
+    return (&Matrix{body: bodyA, ncolumns: n}).Mul(&Matrix{body: matT, ncolumns: n})
+
 }
 
 // newFromStrings converts array string to Matrix
