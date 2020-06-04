@@ -231,6 +231,32 @@ func TestNonsingRandom(t *testing.T) {
     }
 }
 
+//TestRandomMaxRank tests the generating of random max-rank matrices
+func TestRandomMaxRank(t *testing.T) {
+    sizes := []([2]int){
+        [2]int{5, 2},
+        [2]int{6, 2},
+        [2]int{10, 10},
+        [2]int{100, 10},
+        [2]int{200, 10},
+        [2]int{300, 10},
+        [2]int{400, 10},
+        [2]int{500, 10},
+        [2]int{1000, 10},
+        [2]int{1024, 10},
+    }
+    for _, s := range sizes {
+        if ok, er := basicTestRandomMaxRank(int(s[0]/2), s[0], s[1]); !ok {
+            t.Errorf(er)
+        }
+    }
+    for _, s := range sizes {
+        if ok, er := basicTestRandomMaxRank(s[0], int(s[0]/2), s[1]); !ok {
+            t.Errorf(er)
+        }
+    }
+}
+
 //TestPermLeft tests the generating of the left-action permutation
 func TestPermLeft(t *testing.T) {
     permM := []uint8{
@@ -271,6 +297,26 @@ func basicNonsingTestRandom(size, ntests int) (bool, string) {
         mats[i] = Nonsing(size)
         if r := mats[i].Rank(); r != size {
             return false, fmt.Sprintf("problem with Nonsing functions, rank of matrix is not maximal:\n%v\n%v!=%v\n", mats[i], r, size)
+        }
+        for j := 0; j < i; j++ {
+            if mats[i].Equal(mats[j]) {
+                return false, fmt.Sprintf("problem with Random functions, found two equal matrices:\n%v\n%v\n", mats[i], mats[j])
+            }
+        }
+    }
+    return true, ""
+}
+
+func basicTestRandomMaxRank(m, n, ntests int) (bool, string) {
+    mats := make([](*Matrix), ntests)
+    for i := 0; i < ntests; i++ {
+        mats[i] = RandomMaxRank(m, n)
+        rank := m
+        if rank > n {
+            rank = n
+        }
+        if r := mats[i].Rank(); r != rank {
+            return false, fmt.Sprintf("problem with Nonsing functions, rank of matrix is not maximal:\n%v\n%v!=%v\n", mats[i], r, rank)
         }
         for j := 0; j < i; j++ {
             if mats[i].Equal(mats[j]) {

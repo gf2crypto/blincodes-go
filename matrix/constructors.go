@@ -130,6 +130,42 @@ func Random(m int, n ...interface{}) *Matrix {
     return &Matrix{body: body, ncolumns: nc}
 }
 
+//RandomMaxRank returns random (m x n) - matrix of maximal rank.
+//     nonsing = nonsingular(min(nrows, ncolumns))
+//     perm_matrix = permutation(sample(range(max(nrows, ncolumns)),
+//                                      max(nrows, ncolumns)))
+//     if nrows < ncolumns:
+//         return concatenate(nonsing, random(ncolumns - nrows)) * perm_matrix
+//     return perm_matrix * concatenate(nonsing,
+//                                      random(nrows - ncolumns),
+//                                      by_rows=True)
+func RandomMaxRank(m int, n ...interface{}) *Matrix {
+    if m <= 0 {
+        return newEmpty(0, 0)
+    }
+    nc := m
+    if len(n) > 0 {
+        if t, ok := n[0].(int); ok {
+            nc = t
+        } else {
+            panic(fmt.Errorf("matrix: type error, expected number of columns is integer, not %T", n[0]))
+        }
+    }
+    if nc <= 0 {
+        return newEmpty(0, 0)
+    }
+    if nc == m {
+        return Nonsing(m)
+    }
+    if m > nc {
+        a := Nonsing(nc).ConcatenateRows(Random(m-nc, nc))
+        return PermLeft(rand.Perm(m)).Mul(a)
+    }
+    // m < nc
+    a := Nonsing(m).ConcatenateColumns(Random(m, nc-m))
+    return a.Mul(Perm(rand.Perm(nc)))
+}
+
 //Nonsing returns nonsingular random matrix
 // Function uses algorithm of Dana Randall
 // https://www.researchgate.net/publication/2729950_Efficient_Generation_of_Random_Nonsingular_Matrices
