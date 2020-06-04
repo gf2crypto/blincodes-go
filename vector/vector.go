@@ -170,6 +170,26 @@ func (v *Vector) NoLess(v0 *Vector) bool {
     return true
 }
 
+//IsZero tests vector is zero or not
+func (v *Vector) IsZero() bool {
+    for _, b := range v.body {
+        if b != 0 {
+            return false
+        }
+    }
+    return true
+}
+
+//FirstOne returns index of the first one or length of vector if it is zero
+func (v *Vector) FirstOne() []int {
+    for i := 0; i < v.Len(); i++ {
+        if v.Get(i) == 1 {
+            return i
+        }
+    }
+    return v.Len()
+}
+
 // Copy returns copy of vector
 func (v *Vector) Copy() *Vector {
     return &Vector{
