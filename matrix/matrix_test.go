@@ -1,5 +1,6 @@
 package matrix
 
+import "fmt"
 import "testing"
 import "github.com/gf2crypto/blincodes-go/vector"
 
@@ -175,6 +176,75 @@ func TestSolveMultSol(t *testing.T) {
         t.Errorf("wrong base solution of equation %vx^T=(%v)^T: %v != %v:\n",
             mat, vec, mat.Mul(sol.T()), b.T())
     }
+}
+
+//TestRandom tests the generating of random matrices
+func TestRandom(t *testing.T) {
+    sizes := []([2]int){
+        [2]int{5, 10},
+        [2]int{10, 10},
+        [2]int{100, 10},
+        [2]int{200, 10},
+        [2]int{300, 10},
+        [2]int{400, 10},
+        [2]int{500, 10},
+        [2]int{1000, 10},
+        [2]int{1024, 10},
+    }
+    for _, s := range sizes {
+        if ok, er := basicTestRandom(s[0], s[1]); !ok {
+            t.Errorf(er)
+        }
+    }
+}
+
+func basicTestRandom(size, ntests int) (bool, string) {
+    mats := make([](*Matrix), ntests)
+    for i := 0; i < ntests; i++ {
+        mats[i] = Random(size)
+        for j := 0; j < i; j++ {
+            if mats[i].Equal(mats[j]) {
+                return false, fmt.Sprintf("problem with Random functions, found two equal matrices:\n%v\n%v\n", mats[i], mats[j])
+            }
+        }
+    }
+    return true, ""
+}
+
+//TestNonsingRandom tests the generating of random nonsingular matrices
+func TestNonsingRandom(t *testing.T) {
+    sizes := []([2]int){
+        [2]int{5, 10},
+        [2]int{10, 10},
+        [2]int{100, 10},
+        [2]int{200, 10},
+        [2]int{300, 10},
+        [2]int{400, 10},
+        [2]int{500, 10},
+        [2]int{1000, 10},
+        [2]int{1024, 10},
+    }
+    for _, s := range sizes {
+        if ok, er := basicNonsingTestRandom(s[0], s[1]); !ok {
+            t.Errorf(er)
+        }
+    }
+}
+
+func basicNonsingTestRandom(size, ntests int) (bool, string) {
+    mats := make([](*Matrix), ntests)
+    for i := 0; i < ntests; i++ {
+        mats[i] = Nonsing(size)
+        if r := mats[i].Rank(); r != size {
+            return false, fmt.Sprintf("problem with Nonsing functions, rank of matrix is not maximal:\n%v\n%v!=%v\n", mats[i], r, size)
+        }
+        for j := 0; j < i; j++ {
+            if mats[i].Equal(mats[j]) {
+                return false, fmt.Sprintf("problem with Random functions, found two equal matrices:\n%v\n%v\n", mats[i], mats[j])
+            }
+        }
+    }
+    return true, ""
 }
 
 func newUpper() (*Matrix, *Matrix, *Matrix, int) {

@@ -119,8 +119,13 @@ func Random(m int, n ...interface{}) *Matrix {
         return newEmpty(0, 0)
     }
     body := make([](*vector.Vector), 0, m)
+    zero := vector.New(m)
     for i := 0; i < m; i++ {
-        body = append(body, vector.Random(nc))
+        v := vector.Random(nc)
+        for v.Equal(zero) {
+            v = vector.Random(nc)
+        }
+        body = append(body, v)
     }
     return &Matrix{body: body, ncolumns: nc}
 }
@@ -148,7 +153,7 @@ func Nonsing(n int) *Matrix {
         v := make([]uint8, n)
         r := cols.Front()
         for isZero := true; isZero; {
-            for e := cols.Front(); e != nil; e.Next() {
+            for e := cols.Front(); e != nil; e = e.Next() {
                 v[e.Value.(int)] = uint8(rand.Intn(2))
                 if isZero && v[e.Value.(int)] != 0 {
                     isZero = false
@@ -158,12 +163,13 @@ func Nonsing(n int) *Matrix {
         }
         //Update matrix A
         matA[i][r.Value.(int)] = 1
+        // There is a mistake in the paper of Dana Randall: this code was missing in her paper
         for j := i + 1; j < n; j++ {
             matA[j][r.Value.(int)] = uint8(rand.Intn(2))
         }
         //Update matrix T
         a := make([]uint8, n)
-        for e := cols.Front(); e != nil; e.Next() {
+        for e := cols.Front(); e != nil; e = e.Next() {
             a[e.Value.(int)] = v[e.Value.(int)]
         }
         matT[r.Value.(int)] = vector.New(a)
