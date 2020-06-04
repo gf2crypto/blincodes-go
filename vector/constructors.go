@@ -2,6 +2,8 @@ package vector
 
 import "strings"
 import "fmt"
+import "math/rand"
+import "time"
 
 // New creates vector object
 // Examples:
@@ -40,6 +42,19 @@ func New(params ...interface{}) *Vector {
         panic(fmt.Errorf("vector: cannot use constructor New(n int, array []int), expected the second parameter is []int, not %T", params[1]))
     }
     panic(fmt.Errorf("vector: cannot use constructor New(n int, array []int), expected the first parameter is int, not %T", params[0]))
+}
+
+//Random returns random vector of length n
+func Random(n int) *Vector {
+    v := newEmpty(n)
+    rand.Seed(time.Now().UnixNano())
+    for i := 0; i < len(v.body); i++ {
+        v.body[i] = rand.Uint64()
+    }
+    if len(v.body) > 0 && v.lenLast != 0 {
+        v.body[len(v.body)-1] &= (((1 << v.lenLast) - 1) << (wordSize - v.lenLast))
+    }
+    return v
 }
 
 // newFromString converts string to Vector
