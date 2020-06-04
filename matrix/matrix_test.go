@@ -231,6 +231,40 @@ func TestNonsingRandom(t *testing.T) {
     }
 }
 
+//TestPermLeft tests the generating of the left-action permutation
+func TestPermLeft(t *testing.T) {
+    permM := []uint8{
+        0, 0, 0, 1, 0, 0, 0,
+        0, 0, 1, 0, 0, 0, 0,
+        0, 0, 0, 0, 1, 0, 0,
+        0, 1, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 1, 0,
+    }
+    perm := []int{3, 2, 4, 1, 6, 0, 5}
+    if p, res := PermLeft(perm), New(7, permM); !p.Equal(res) {
+        t.Errorf("wrong permutation matrix, expected:\n%v\ngot:\n%v\n", p, res)
+    }
+}
+
+//TestPerm tests the generating of the right-action permutation
+func TestPerm(t *testing.T) {
+    permM := []uint8{
+        0, 0, 0, 1, 0, 0, 0,
+        0, 0, 1, 0, 0, 0, 0,
+        0, 0, 0, 0, 1, 0, 0,
+        0, 1, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 1, 0,
+    }
+    perm := []int{5, 3, 1, 0, 2, 6, 4}
+    if p, res := Perm(perm), New(7, permM); !p.Equal(res) {
+        t.Errorf("wrong permutation matrix, expected:\n%v\ngot:\n%v\n", p, res)
+    }
+}
+
 func basicNonsingTestRandom(size, ntests int) (bool, string) {
     mats := make([](*Matrix), ntests)
     for i := 0; i < ntests; i++ {

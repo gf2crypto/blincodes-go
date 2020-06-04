@@ -183,6 +183,43 @@ func Nonsing(n int) *Matrix {
 
 }
 
+//PermLeft returns permutation matrix corresponding to the left-action permutation
+func PermLeft(p []int) *Matrix {
+    if len(p) == 0 {
+        return newEmpty(0, 0)
+    }
+    body := make([](*vector.Vector), 0, len(p))
+    for _, j := range p {
+        v := make([]uint8, len(p))
+        if j >= 0 && j < len(p) {
+            v[j] = 1
+        }
+        body = append(body, vector.New(v))
+    }
+    return &Matrix{body: body, ncolumns: len(p)}
+}
+
+//Perm returns permutation matrix corresponding to the right-action permutation
+func Perm(p []int) *Matrix {
+    if len(p) == 0 {
+        return newEmpty(0, 0)
+    }
+    tmp := make([][]uint8, len(p))
+    for i := 0; i < len(p); i++ {
+        tmp[i] = make([]uint8, len(p))
+    }
+    for i, j := range p {
+        if j >= 0 && j < len(p) {
+            tmp[j][i] = 1
+        }
+    }
+    body := make([](*vector.Vector), 0, len(p))
+    for i := 0; i < len(p); i++ {
+        body = append(body, vector.New(tmp[i]))
+    }
+    return &Matrix{body: body, ncolumns: len(p)}
+}
+
 // newFromStrings converts array string to Matrix
 // Function supports the following filler for zero symbol:
 //       '0' == '0', '-'
