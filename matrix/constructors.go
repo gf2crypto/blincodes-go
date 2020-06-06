@@ -37,6 +37,19 @@ func New(params ...interface{}) *Matrix {
             return newEmpty(0, 0)
         case []string:
             return newFromStrings(t)
+        case *vector.Vector:
+            return &Matrix{body: [](*vector.Vector){t}, ncolumns: t.Len()}
+        case [](*vector.Vector):
+            ncolumns := -1
+            for _, v := range t {
+                if ncolumns >= 0 && v.Len() != ncolumns {
+                    panic(fmt.Errorf("matrix: expected all vectors have the same length"))
+                }
+                if ncolumns < 0 {
+                    ncolumns = v.Len()
+                }
+            }
+            return &Matrix{body: t, ncolumns: ncolumns}
         case string:
             return newFromStrings(strings.Split(t, "\n"))
         default:

@@ -181,7 +181,7 @@ func (v *Vector) IsZero() bool {
 }
 
 //FirstOne returns index of the first one or length of vector if it is zero
-func (v *Vector) FirstOne() []int {
+func (v *Vector) FirstOne() int {
     for i := 0; i < v.Len(); i++ {
         if v.Get(i) == 1 {
             return i

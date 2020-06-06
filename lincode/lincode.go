@@ -1,54 +1,128 @@
 package lincode
 
+import "fmt"
 import "github.com/gf2crypto/blincodes-go/matrix"
 import "github.com/gf2crypto/blincodes-go/vector"
 
-//LinearCode defines the basic interface of linear block code
-type LinearCode interface {
-    Gen() *matrix.Matrix
-    ParityCheck() *matrix.Matrix
+//LinearCode represents generic binary linear code
+//This type is immutable
+type LinearCode struct {
+    generator   *matrix.Matrix
+    parityCheck *matrix.Matrix
 }
 
-//HadamardProd evaluates the Hadamard product of linear codes
-func HadamardProd(codeA, codeB *LinearCode) *LinearCode {
-    genA, genB := codeA.Gen(), codeB.Gen()
-    b := make(map[int](*vector.Vector))
-    hmbasis := make(map[int](*vector.Vector))
-    for i := 0; i < genA.Nrows(); i++ {
-        for j := 0; j < genB.Nrows(); j++ {
-            row := genA.GetRow(i).And(genB.GetRow(j))
-            sum := row.Copy()
-            for i, r := range b {
-                if row.Get(i) != 0 {
-                    sum = sum.Xor(r)
-                }
-            }
-            t := sum.FirstOne()
-            if t != sum.Len() {
-                b[t] = sum
-                hmbasis[len(hmbasis)] = row
+//D returns -1 because where is no simple method to
+//evaluate of code distance unstructured code
+func (code *LinearCode) D() int {
+    return -1
+}
+
+//K return dimension of linear code
+func (code *LinearCode) K() int {
+    if code.generator != nil {
+        return code.generator.Nrows()
+    }
+    if code.parityCheck != nil {
+        return code.parityCheck.Ncolumns() - code.parityCheck.Nrows()
+    }
+    return 0
+}
+
+//N return length of linear code
+func (code *LinearCode) N() int {
+    if code.generator != nil {
+        return code.generator.Ncolumns()
+    }
+    if code.parityCheck != nil {
+        return code.parityCheck.Ncolumns()
+    }
+    return 0
+}
+
+//Gen returns generator of linear codes
+func (code *LinearCode) Gen() *matrix.Matrix {
+    if code.generator != nil {
+        return code.generator
+    }
+    if code.parityCheck != nil {
+        code.generator = code.parityCheck.Orthogonal()
+        return code.generator
+    }
+    return matrix.New(0)
+}
+
+//ParityCheck returns parity check of linear codes
+func (code *LinearCode) ParityCheck() *matrix.Matrix {
+    if code.parityCheck != nil {
+        return code.parityCheck
+    }
+    if code.generator != nil {
+        code.parityCheck = code.generator.Orthogonal()
+        return code.parityCheck
+    }
+    return matrix.New(0)
+}
+
+//FromCodeWords returns code defined by list of code words
+func FromCodeWords(words interface{}) *LinearCode {
+    switch w := words.(type) {
+    case *matrix.Matrix:
+        m := w.Diagonal()
+        v := make([](*vector.Vector), 0, m.Nrows())
+        for i := 0; i < m.Nrows(); i++ {
+            if r := m.GetRow(i); !r.IsZero() {
+                v = append(v, r)
             }
         }
+        if len(v) == 0 {
+            v = append(v, vector.New(m.Ncolumns()))
+        }
+        return &LinearCode{generator: matrix.New(v), parityCheck: nil}
+    case [](*vector.Vector):
+        m := matrix.New(w).Diagonal()
+        v := make([](*vector.Vector), 0, m.Nrows())
+        for i := 0; i < m.Nrows(); i++ {
+            if r := m.GetRow(i); !r.IsZero() {
+                v = append(v, r)
+            }
+        }
+        if len(v) == 0 {
+            v = append(v, vector.New(m.Ncolumns()))
+        }
+        return &LinearCode{generator: matrix.New(v), parityCheck: nil}
+    default:
+        panic(fmt.Errorf("lincode: cannot create code from %T", w))
     }
-    body := make([](*vector.Vector), 0, len(hmbasis))
-    for _, r := range hmbasis {
-        body = append(body, r)
+}
+
+//FromParityChecks returns code defined by list of parity check words
+func FromParityChecks(words interface{}) *LinearCode {
+    switch w := words.(type) {
+    case *matrix.Matrix:
+        m := w.Diagonal()
+        v := make([](*vector.Vector), 0, m.Nrows())
+        for i := 0; i < m.Nrows(); i++ {
+            if r := m.GetRow(i); !r.IsZero() {
+                v = append(v, r)
+            }
+        }
+        if len(v) == 0 {
+            v = append(v, vector.New(m.Ncolumns()))
+        }
+        return &LinearCode{generator: nil, parityCheck: matrix.New(v)}
+    case [](*vector.Vector):
+        m := matrix.New(w).Diagonal()
+        v := make([](*vector.Vector), 0, m.Nrows())
+        for i := 0; i < m.Nrows(); i++ {
+            if r := m.GetRow(i); !r.IsZero() {
+                v = append(v, r)
+            }
+        }
+        if len(v) == 0 {
+            v = append(v, vector.New(m.Ncolumns()))
+        }
+        return &LinearCode{parityCheck: matrix.New(v), generator: nil}
+    default:
+        panic(fmt.Errorf("lincode: cannot create code from %T", w))
     }
-    return FromCodeWords(body)
-}
-
-//Intersect intersects of codes
-func Intersect(codeA, codeB *LinearCode) *LinearCode {
-    return FromParityChecks(codeA.ParityCheck().ConcatenateRows(codeB.ParityCheck()))
-}
-
-//Sum evaluates sum of codes
-func Sum(codeA, codeB *LinearCode) *LinearCode {
-    return FromCodeWords(codeA.Gen().ConcatenateRows(codeB.Gen()))
-}
-
-//Hull evaluates hull of code
-//The code's hull is intersection of code and it's dual.
-func Hull(code *LinearCode) *LinearCode {
-    return FromParityChecks(code.Gen().ConcatenateRows(code.ParityCheck()))
 }
