@@ -20,6 +20,9 @@ func (code *LinearCode) D() int {
 //K return dimension of linear code
 func (code *LinearCode) K() int {
     if code.generator != nil {
+        if code.generator.Nrows() == 1 && code.generator.GetRow(0).Equal(vector.New(code.generator.Ncolumns())) {
+            return 0
+        }
         return code.generator.Nrows()
     }
     if code.parityCheck != nil {

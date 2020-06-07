@@ -98,6 +98,9 @@ func Truncate(code AbstractLinearCode, columns []int) AbstractLinearCode {
             body = append(body, gen.GetRow(i))
         }
     }
+    if len(body) == 0 {
+        body = [](*vector.Vector){vector.New(code.N())}
+    }
     return FromCodeWords(body)
 }
 
@@ -106,7 +109,19 @@ func IsSubset(codeA, codeB AbstractLinearCode) bool {
     if codeA.N() != codeB.N() || codeA.K() > codeB.K() {
         return false
     }
-    if codeB.ParityCheck().Mul(codeA.Gen().T()).Equal(matrix.New(codeB.N()-codeB.K(), codeA.K())) {
+    k := codeA.K()
+    if k == 0 {
+        k++
+    }
+    if codeB.ParityCheck().Mul(codeA.Gen().T()).Equal(matrix.New(codeB.N()-codeB.K(), k)) {
+        return true
+    }
+    return false
+}
+
+//IsEqual tests if codeA is equal codeB or not
+func IsEqual(codeA, codeB AbstractLinearCode) bool {
+    if codeA.K() == codeB.K() && IsSubset(codeA, codeB) {
         return true
     }
     return false
@@ -137,7 +152,13 @@ func Iter(code AbstractLinearCode) <-chan *vector.Vector {
         for carry == 0 {
             ch <- matrix.New(vector.New(v)).Mul(code.Gen()).GetRow(0)
             for i := 0; i < len(v); i++ {
-                v[len(v)-i-1], carry = (v[len(v)-i-1]+1+carry)%2, ((v[len(v)-i-1] + 1 + carry) >> 1)
+                t := 0
+                if i == 0 {
+                    t = v[len(v)-i-1] + 1
+                } else {
+                    t = v[len(v)-i-1] + carry
+                }
+                v[len(v)-i-1], carry = t%2, t>>1
                 if carry == 0 {
                     break
                 }
@@ -162,10 +183,11 @@ func D(code AbstractLinearCode) int {
         return d
     }
     sp := Spectrum(code)
-    for d := range *sp {
-        if d != 0 {
-            return d
+    d := 0
+    for i := range *sp {
+        if i != 0 && (d == 0 || i < d) {
+            d = i
         }
     }
-    return 0
+    return d
 }
