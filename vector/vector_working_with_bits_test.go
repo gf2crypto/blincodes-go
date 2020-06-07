@@ -156,3 +156,24 @@ func TestBitsLenMore64(t *testing.T) {
         }
     }
 }
+
+//TestIter tests function for iterating over vector's bits
+func TestIter(t *testing.T) {
+    v3 := []uint8{
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
+        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
+        0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+        0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    }
+    v := New(v3)
+    i := 0
+    for b := range v.Iter() {
+        if v3[i] != b {
+            t.Errorf("vector testing: v3.Bits() is incorrect, (v3[%d] = %d) != %d",
+                i, v3[i], b)
+        }
+        i++
+    }
+}

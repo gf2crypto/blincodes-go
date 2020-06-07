@@ -175,6 +175,27 @@ func TestNewFromIntegerArray(t *testing.T) {
     }
 }
 
+//TestIter tests function for iterating over matrix's rows.
+func TestIter(t *testing.T) {
+    mat := New(6, []uint8{
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
+        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
+        0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+        0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+    })
+    body := mat.body
+    i := 0
+    for b := range mat.Iter() {
+        if !body[i].Equal(b) {
+            t.Errorf("matrix testing: range mat is incorrect, (mat[%d] = %d) != %d",
+                i, body[i], b)
+        }
+        i++
+    }
+}
+
 func checkResult(method string, mat *Matrix, res string, nrows, ncolumns int) string {
     if fmt.Sprint(mat) != res {
         return fmt.Sprintf("matrix constructor testing:  %v is incorrect, %s != %v)",
