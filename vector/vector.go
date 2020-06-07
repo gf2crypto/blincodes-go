@@ -358,6 +358,18 @@ func (v *Vector) Resize(delta int) *Vector {
     return w
 }
 
+//Iter iterates over elements
+func (v *Vector) Iter() <-chan byte {
+    ch := make(chan byte)
+    go func() {
+        defer close(ch)
+        for i := 0; i < v.Len(); i++ {
+            ch <- byte(v.Get(i))
+        }
+    }()
+    return ch
+}
+
 // set sets i-th bit of vector to value
 func (v *Vector) set(i int, val byte) *Vector {
     if i < 0 {

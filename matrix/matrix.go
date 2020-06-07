@@ -351,3 +351,15 @@ func (mat *Matrix) Solve(v *vector.Vector) ([](*vector.Vector), *vector.Vector) 
     }
     return fund, sol
 }
+
+//Iter iterates over rows
+func (mat *Matrix) Iter() <-chan *vector.Vector {
+    ch := make(chan *vector.Vector)
+    go func() {
+        defer close(ch)
+        for i := 0; i < len(mat.body); i++ {
+            ch <- mat.body[i]
+        }
+    }()
+    return ch
+}
