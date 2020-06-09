@@ -11,10 +11,9 @@ type LinearCode struct {
     parityCheck *matrix.Matrix
 }
 
-//D returns -1 because where is no simple method to
-//evaluate of code distance unstructured code
+//D returns code distance of code
 func (code *LinearCode) D() int {
-    return -1
+    return D(code)
 }
 
 //K return dimension of linear code

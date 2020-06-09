@@ -179,9 +179,6 @@ func Spectrum(code AbstractLinearCode) *map[int]int {
 
 //D returns code distance of code
 func D(code AbstractLinearCode) int {
-    if d := code.D(); d != -1 {
-        return d
-    }
     sp := Spectrum(code)
     d := 0
     for i := range *sp {

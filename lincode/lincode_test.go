@@ -110,3 +110,13 @@ func TestFromParityChecks(t *testing.T) {
         t.Errorf("rm24.H is wrong:\n%v", rm24.ParityCheck())
     }
 }
+
+//TestLinCodeD tests to evaluate of code distance.
+func TestLinCodeD(t *testing.T) {
+    if d := FromCodeWords(matrices["rm14"]).D(); d != 8 {
+        t.Errorf("D(RM(1,4)) is wrong: expected 8, but got %v", d)
+    }
+    if d := FromCodeWords(matrices["rm24"]).D(); d != 4 {
+        t.Errorf("D(RM(2,4)) is wrong: expected 4, but got %v\n", d)
+    }
+}
