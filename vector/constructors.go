@@ -57,6 +57,38 @@ func Random(n int) *Vector {
     return v
 }
 
+//PackBytes packs byte array into the vector
+//  Examples:
+//  PackBytes([]byte{0x01, 0x02, 0x03}, 24) -> 000000010000001000000011
+//  PackBytes([]byte{0x01, 0x02, 0x03}, 11) -> 00000001000
+//  PackBytes([]byte{0x01, 0x02, 0x03}, 30) -> 000000010000001000000011000000
+//  PackBytes([]byte{}, 3) -> 000
+func PackBytes(b []byte, n int) *Vector {
+    nBytes := n / 8
+    if n % 8 != 0 {
+        nBytes += 1
+    }
+    r := wordSize / 8
+    lenBody := n / wordSize
+    lenLast := n % wordSize
+    if lenLast != 0 {
+        lenBody++
+    }
+    body := make([]uint64, lenBody)
+    for i:=0; i < lenBody; i++{
+        if r * i >= len(b) {
+            break
+        }
+        for j := 0; j < r; j++ {
+            body[i] <<= 8
+            if r*i+j < len(b) {
+                body[i] ^= uint64(b[r*i+j])
+            }
+        }
+    }
+    return &Vector{body: body, lenLast: lenLast}
+}
+
 // newFromString converts string to Vector
 // Function supports the following filler for zero symbol:
 //       '0' == '0', '-'

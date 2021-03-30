@@ -94,3 +94,56 @@ func TestNewLenMore64(t *testing.T) {
         t.Errorf("vector testing: init is incorrect, lenLast != 29 (%d != 29)", v.lenLast)
     }
 }
+
+func TestPackBytes(t *testing.T) {
+    b := []byte{
+        0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
+        0xEF, 0x98,
+    }
+    v := PackBytes(b, len(b)*8)
+    exps := "00000001001000110100010101100111100010011010101111001101111011111110111110011000"
+    if v.Len() != len(b) * 8 {
+        t.Errorf("expected len(v)=%d, but got %d", len(b) * 8, v.Len())
+    }
+    if v.String() != exps {
+        t.Errorf("expected v=\n%s, but got\n%s", exps, v.String())
+    }
+
+    v = PackBytes(b, 61)
+    exps = "0000000100100011010001010110011110001001101010111100110111101"
+    if v.Len() != 61 {
+        t.Errorf("expected len(v)=%d, but got %d", 61, v.Len())
+    }
+    if v.String() != exps {
+        t.Errorf("expected v=\n%s, but got\n%s", exps, v.String())
+    }
+
+    v = PackBytes(b, 65)
+    exps = "00000001001000110100010101100111100010011010101111001101111011111"
+    if v.Len() != 65 {
+        t.Errorf("expected len(v)=%d, but got %d", 65, v.Len())
+    }
+    if v.String() != exps {
+        t.Errorf("expected v=\n%s, but got\n%s", exps, v.String())
+    }
+
+    v = PackBytes(b[5:6], 3)
+    exps = "101"
+    if v.Len() != 3 {
+        t.Errorf("expected len(v)=%d, but got %d", 3, v.Len())
+    }
+    if v.String() != exps {
+        t.Errorf("expected v=\n%s, but got\n%s", exps, v.String())
+    }
+
+    v = PackBytes(make([]byte,0), 5)
+    exps = "00000"
+    if v.Len() != 5 {
+        t.Errorf("expected len(v)=%d, but got %d", 5, v.Len())
+    }
+    if v.String() != exps {
+        t.Errorf("expected v=\n%s, but got\n%s", exps, v.String())
+    }
+}
+
+

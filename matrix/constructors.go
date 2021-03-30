@@ -98,6 +98,22 @@ func New(params ...interface{}) *Matrix {
     return &Matrix{body: body, ncolumns: ncolumns}
 }
 
+//PackBytes packs the byte 2-D array into the binary matrix
+func PackBytes(b [][]byte, n int) *Matrix {
+    ncolumns := n
+    if ncolumns < 0 {
+        ncolumns = 0
+    }
+    if ncolumns == 0 || len(b) == 0 {
+        return &Matrix{body: make([]*vector.Vector, 0,0 ), ncolumns: 0}
+    }
+    body := make([]*vector.Vector, len(b))
+    for i, a := range b {
+        body[i] = vector.PackBytes(a, ncolumns)
+    }
+    return &Matrix{body: body, ncolumns: ncolumns}
+}
+
 //Identity creates identity matrix of size n
 func Identity(n int) *Matrix {
     if n <= 0 {

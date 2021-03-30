@@ -196,6 +196,53 @@ func TestIter(t *testing.T) {
     }
 }
 
+func TestPackBytes(t *testing.T) {
+    b := [][]byte {
+        {0x01, 0x02, 0x03},
+        {0xAB, 0xBC, 0xFD},
+        {},
+        {0x76, 0x57, 0xAA, 0xED, 0xFF},
+    }
+    mat := PackBytes(b, 5)
+    mat5 := "00000\n" +
+            "10101\n" +
+            "00000\n" +
+            "01110"
+    if res := checkResult("PackBytes(b ,5)", mat, mat5, 4, 5); res != "" {
+        t.Errorf(res)
+    }
+    mat = PackBytes(b, 24)
+    mat24 :=
+        "000000010000001000000011\n" +
+        "101010111011110011111101\n" +
+        "000000000000000000000000\n" +
+        "011101100101011110101010"
+    if res := checkResult("PackBytes(b ,24)", mat, mat24, 4, 24); res != "" {
+        t.Errorf(res)
+    }
+
+    mat = PackBytes(b, 30)
+    mat30 :=
+            "000000010000001000000011000000\n" +
+            "101010111011110011111101000000\n" +
+            "000000000000000000000000000000\n" +
+            "011101100101011110101010111011"
+    if res := checkResult("PackBytes(b ,30)", mat, mat30, 4, 30); res != "" {
+        t.Errorf(res)
+    }
+
+    mat = PackBytes([][]byte{}, 30)
+    mat0 := ""
+    if res := checkResult("PackBytes(NIL ,30)", mat, mat0, 0, 0); res != "" {
+        t.Errorf(res)
+    }
+
+    mat = PackBytes(b, -10)
+    if res := checkResult("PackBytes(b ,-10)", mat, mat0, 0, 0); res != "" {
+        t.Errorf(res)
+    }
+}
+
 func checkResult(method string, mat *Matrix, res string, nrows, ncolumns int) string {
     if fmt.Sprint(mat) != res {
         return fmt.Sprintf("matrix constructor testing:  %v is incorrect, %s != %v)",
