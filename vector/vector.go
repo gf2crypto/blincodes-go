@@ -1,32 +1,31 @@
 package vector
 
-import "bytes"
+import (
+    "bytes"
+    "unsafe"
+)
 import "fmt"
 import "strings"
 
-const wordSize = 64
-const maxInt = 0xFFFFFFFFFFFFFFFF
+type word uint
+const WordSize = uint(unsafe.Sizeof(word(0))) << 3
+const MaxInteger = ^word(0)
 
 //Vector represents binary vector
-//This type is mutable
-//Almost all functions which operates over Vectors
-//change the recipient
+//This type is immutable
 type Vector struct {
-    body    []uint64 // packed binary vector
-    lenLast int      //len of the last element of body array
+    body    []word // packed binary vector
+    lenLast uint      //len of the last element of body array
 }
 
 func (v *Vector) String() string {
     var buf bytes.Buffer
-    fs := fmt.Sprintf("%%0%db", wordSize)
+    fs := fmt.Sprintf("%%0%db", WordSize)
     for _, w := range v.body {
         fmt.Fprintf(&buf, fs, w)
     }
-    if v.lenLast != 0 {
-        s := buf.String()
-        return s[:(len(s) - (wordSize - v.lenLast))]
-    }
-    return buf.String()
+    s := buf.String()
+    return s[:(len(s) - int(WordSize- v.lenLast))]
 }
 
 // PrettyString returns pretty formatted string of vector representation
@@ -35,165 +34,60 @@ func (v *Vector) String() string {
 func (v *Vector) PrettyString() string {
     var buf bytes.Buffer
     zeroSub := "-"
-    fs := fmt.Sprintf("%%0%db", wordSize)
+    fs := fmt.Sprintf("%%0%db", WordSize)
     for _, w := range v.body {
         fmt.Fprint(&buf, strings.ReplaceAll(fmt.Sprintf(fs, w), "0", zeroSub))
     }
-    if v.lenLast != 0 {
-        s := buf.String()
-        return s[:(len(s) - (wordSize - v.lenLast))]
-    }
-    return buf.String()
+    s := buf.String()
+    return s[:(len(s) - int(WordSize- v.lenLast))]
 }
 
-// Len returns len of vector
+// Len returns length of vector
 func (v *Vector) Len() int {
     if len(v.body) == 0 {
         return 0
     }
-    l := (len(v.body) << 6)
+    l := len(v.body) << 6
     if v.lenLast != 0 {
-        l -= (wordSize - v.lenLast)
+        l -= int(WordSize - v.lenLast)
     }
     return l
 }
 
-//Equal return true if vector v is equal vector v0
-//Return v == v0?
-func (v *Vector) Equal(v0 *Vector) bool {
-    if v.Len() != v0.Len() {
-        return false
+// Cmp compares vector v and vector u and returns
+// -1 if v < u
+//  0 if v == u
+//  1 if v > u
+func (v *Vector) Cmp(u *Vector) int {
+    if v.Len() < u.Len() {
+        return -1
     }
-    if v.Len() != 0 {
-        for i, b := range v.body {
-            if v0.body[i] != b {
-                return false
-            }
+    if v.Len() > u.Len() {
+        return 1
+    }
+    for i, b := range v.body {
+        switch {
+        case b < u.body[i]: return -1
+        case b > u.body[i]: return 1
         }
     }
-    return true
+    return 0
 }
 
-//Less return true if vector v is less vector v0
-//Return v < v0?
-func (v *Vector) Less(v0 *Vector) bool {
-    if v.Len() < v0.Len() {
-        return true
-    }
-    if v.Len() > v0.Len() {
-        return false
-    }
-    if v.Len() != 0 {
-        for i, b := range v.body {
-            switch {
-            case b < v0.body[i]:
-                return true
-            case b > v0.body[i]:
-                return false
-            default:
-                continue
-            }
-        }
-    }
-    return false
-}
-
-//More return true if vector v is more vector v0
-//Return v > v0?
-func (v *Vector) More(v0 *Vector) bool {
-    if v.Len() < v0.Len() {
-        return false
-    }
-    if v.Len() > v0.Len() {
-        return true
-    }
-    if v.Len() != 0 {
-        for i, b := range v.body {
-            switch {
-            case b < v0.body[i]:
-                return false
-            case b > v0.body[i]:
-                return true
-            default:
-                continue
-            }
-        }
-    }
-    return false
-}
-
-//NoMore return true if vector v is no more vector v0
-//Return v <= v0?
-func (v *Vector) NoMore(v0 *Vector) bool {
-    if v.Len() < v0.Len() {
-        return true
-    }
-    if v.Len() > v0.Len() {
-        return false
-    }
-    if v.Len() != 0 {
-        for i, b := range v.body {
-            switch {
-            case b < v0.body[i]:
-                return true
-            case b > v0.body[i]:
-                return false
-            default:
-                continue
-            }
-        }
-    }
-    return true
-}
-
-//NoLess return true if vector v is no less vector v0
-//Return v >= v0?
-func (v *Vector) NoLess(v0 *Vector) bool {
-    if v.Len() < v0.Len() {
-        return false
-    }
-    if v.Len() > v0.Len() {
-        return true
-    }
-    if v.Len() != 0 {
-        for i, b := range v.body {
-            switch {
-            case b < v0.body[i]:
-                return false
-            case b > v0.body[i]:
-                return true
-            default:
-                continue
-            }
-        }
-    }
-    return true
-}
-
-//IsZero tests vector is zero or not
-func (v *Vector) IsZero() bool {
-    for _, b := range v.body {
-        if b != 0 {
-            return false
-        }
-    }
-    return true
-}
-
-//FirstOne returns index of the first one or length of vector if it is zero
-func (v *Vector) FirstOne() int {
+//GetFirstOne returns index of the first one or -1 if it is zero
+func (v *Vector) GetFirstOne() int {
     for i := 0; i < v.Len(); i++ {
         if v.Get(i) == 1 {
             return i
         }
     }
-    return v.Len()
+    return -1
 }
 
 // Copy returns copy of vector
 func (v *Vector) Copy() *Vector {
     return &Vector{
-        body:    append(make([]uint64, 0, len(v.body)), v.body...),
+        body:    append(make([]word, 0, len(v.body)), v.body...),
         lenLast: v.lenLast,
     }
 }
@@ -207,7 +101,7 @@ func (v *Vector) Get(i int) byte {
         panic(fmt.Errorf("vector: index %d out of range, expected integer in [0, %d)",
             i, v.Len()))
     }
-    if v.body[i/wordSize]&(1<<(wordSize-i%wordSize-1)) == 0 {
+    if v.body[i/int(WordSize)]&(1<<(int(WordSize)-i%int(WordSize)-1)) == 0 {
         return 0
     }
     return 1
@@ -254,64 +148,60 @@ func (v *Vector) Zeroes() []int {
     return zeroes
 }
 
-//Xor evaluates xor of two vectors.
-// return v ^ v0
-func (v *Vector) Xor(v0 *Vector) *Vector {
-    if v.Len() != v0.Len() {
+//Xor sets v to u XOR w and returns v
+func (v *Vector) Xor(u, w *Vector) *Vector {
+    if u.Len() != w.Len() {
         panic(fmt.Errorf("vector: vectors have different length: %d != %d",
-            v.Len(), v0.Len()))
+            u.Len(), w.Len()))
     }
-    res := v.Copy()
-    for i, b := range v0.body {
-        res.body[i] ^= b
+    v.body = make([]word, u.Len())
+    for i, b := range u.body {
+        v.body[i] = b ^ w.body[i]
     }
-    return res
+    return v
 }
 
-//Or evaluates or of two vectors.
-//return v | v0
-func (v *Vector) Or(v0 *Vector) *Vector {
-    if v.Len() != v0.Len() {
+//Or sets v to u OR w and returns v
+func (v *Vector) Or(u, w *Vector) *Vector {
+    if u.Len() != w.Len() {
         panic(fmt.Errorf("vector: vectors have different length: %d != %d",
-            v.Len(), v0.Len()))
+            u.Len(), w.Len()))
     }
-    res := v.Copy()
-    for i, b := range v0.body {
-        res.body[i] |= b
+    v.body = make([]word, u.Len())
+    for i, b := range u.body {
+        v.body[i] = b | w.body[i]
     }
-    return res
+    return v
 }
 
-//And evaluates and of two vectors.
-//return v & v0
-func (v *Vector) And(v0 *Vector) *Vector {
-    if v.Len() != v0.Len() {
+//And sets v to u AND w and returns v
+func (v *Vector) And(u, w *Vector) *Vector {
+    if u.Len() != w.Len() {
         panic(fmt.Errorf("vector: vectors have different length: %d != %d",
-            v.Len(), v0.Len()))
+            u.Len(), w.Len()))
     }
-    res := v.Copy()
-    for i, b := range v0.body {
-        res.body[i] &= b
+    v.body = make([]word, u.Len())
+    for i, b := range u.body {
+        v.body[i] = b & w.body[i]
     }
-    return res
+    return v
 }
 
-//Not evaluates not of vectors.
-//return ^v
-func (v *Vector) Not() *Vector {
-    res := v.Copy()
-    for i, b := range res.body {
-        res.body[i] = ^b
+//Not sets v to ^u and returns v
+func (v *Vector) Not(u *Vector) *Vector {
+    v.body = make([]word, u.Len())
+    for i, b := range u.body {
+        v.body[i] = ^b
     }
-    if res.lenLast != 0 {
-        res.body[len(res.body)-1] &= (((1 << res.lenLast) - 1) << (wordSize - res.lenLast))
+    v.lenLast = u.lenLast
+    if v.lenLast != 0 {
+        v.body[len(v.body)-1] &= ((1 << v.lenLast) - 1) << (WordSize - v.lenLast)
     }
-    return res
+    return v
 }
 
-//Concatenate concatenates of two vectors
-// return (v || v0)
-func (v *Vector) Concatenate(v0 *Vector) *Vector {
+//Concatenate sets v to concatenation of u and w and returns v
+func (v *Vector) Concatenate(u, w *Vector) *Vector {
     if v0 == nil || len(v0.body) == 0 {
         return v
     }
@@ -380,9 +270,9 @@ func (v *Vector) set(i int, val byte) *Vector {
             i, v.Len()))
     }
     if val == 0 {
-        v.body[i/wordSize] &= (maxInt ^ (1 << (wordSize - i%wordSize - 1)))
+        v.body[i/int(WordSize)] &= MaxInteger ^ (1 << (int(WordSize) - i%int(WordSize) - 1))
     } else {
-        v.body[i/wordSize] |= (1 << (wordSize - i%wordSize - 1))
+        v.body[i/int(WordSize)] |= 1 << (int(WordSize) - i%int(WordSize) - 1)
     }
     return v
 }
