@@ -18,14 +18,13 @@ const MaxInteger = ^word(0)
 //This type is immutable
 type Vector struct {
 	body    []word // packed binary vector
-	lenLast uint      //len of the last element of body array
+	lenLast uint   //len of the last element of body array
 }
 
 //New returns empty vector
 func New() *Vector {
 	return &Vector{body: nil, lenLast: WordSize}
 }
-
 
 //makeVector allocates memory for vector of length n
 func makeVector(n uint) ([]word, uint) {
@@ -43,15 +42,15 @@ func makeVector(n uint) ([]word, uint) {
 }
 
 //SetZero sets v to a units vector of length n, returns v
-func (v* Vector) SetZero(n uint) *Vector {
+func (v *Vector) SetZero(n uint) *Vector {
 	v.body, v.lenLast = makeVector(n)
 	return v
 }
 
 //SetV sets v to u, returns v
-func (v* Vector) SetV(u *Vector) *Vector {
+func (v *Vector) SetV(u *Vector) *Vector {
 	v.body, v.lenLast = makeVector(u.Len())
-	for i:=0; i < len(v.body); i++ {
+	for i := 0; i < len(v.body); i++ {
 		v.body[i] = u.body[i]
 	}
 	return v
@@ -62,15 +61,15 @@ func (v *Vector) Len() uint {
 	if v.body == nil {
 		return 0
 	}
-	return (uint(len(v.body)) - 1) * WordSize + v.lenLast
+	return (uint(len(v.body))-1)*WordSize + v.lenLast
 }
 
 //SetUnits sets v to a units vector of length n
-func (v* Vector) SetUnits(n uint) *Vector {
+func (v *Vector) SetUnits(n uint) *Vector {
 	v.body, v.lenLast = makeVector(n)
-	for i:=0; i < len(v.body); i++ {
+	for i := 0; i < len(v.body); i++ {
 		v.body[i] = ^v.body[i]
-		if i + 1 == len(v.body){
+		if i+1 == len(v.body) {
 			v.body[i] &= ((1 << v.lenLast) - 1) << (WordSize - v.lenLast)
 		}
 	}
@@ -85,13 +84,13 @@ func (v* Vector) SetUnits(n uint) *Vector {
 //  SetBytes([]byte{}, 3) -> 000
 func (v *Vector) SetBytes(b []byte, n uint) *Vector {
 	nBytes := n / 8
-	if n % 8 != 0 {
+	if n%8 != 0 {
 		nBytes += 1
 	}
 	r := WordSize / 8
 	v.body, v.lenLast = makeVector(n)
-	for i:=uint(0); i < uint(len(v.body)); i++{
-		if r * i >= uint(len(b)) {
+	for i := uint(0); i < uint(len(v.body)); i++ {
+		if r*i >= uint(len(b)) {
 			break
 		}
 		for j := uint(0); j < r; j++ {
@@ -106,7 +105,7 @@ func (v *Vector) SetBytes(b []byte, n uint) *Vector {
 
 //SetRandom sets v to a random vector of length n
 func (v *Vector) SetRandom(n uint) *Vector {
-	b := make([]byte, n / 8 + 1)
+	b := make([]byte, n/8+1)
 	_, err := rand.Read(b)
 	if err != nil {
 		panic(err)
@@ -120,7 +119,7 @@ func (v *Vector) SetRandom(n uint) *Vector {
 // Example:
 //   "--110-1- - - 1-  * 11 0 " -> 0011001000100110
 func (v *Vector) Parse(s string) (*Vector, error) {
-	repl := map[string] string {
+	repl := map[string]string{
 		" ": "",
 		"-": "0",
 		"*": "0",
@@ -134,7 +133,7 @@ func (v *Vector) Parse(s string) (*Vector, error) {
 		return v, nil
 	}
 	body, lenLast := makeVector(uint(len(s)))
-	for i,j:=uint(0),0; j < len(body); j++ {
+	for i, j := uint(0), 0; j < len(body); j++ {
 		max := i + WordSize
 		if max > uint(len(s)) {
 			max = uint(len(s))
@@ -153,13 +152,13 @@ func (v *Vector) Parse(s string) (*Vector, error) {
 
 //SetBitArray converts bit array to Vector and sets v to the result
 func (v *Vector) SetBitArray(array []byte) *Vector {
-    body, lenLast := makeVector(uint(len(array)))
+	body, lenLast := makeVector(uint(len(array)))
 	for i, b := range array {
 		switch {
 		case b == 1:
 			body[i/int(WordSize)] ^= 1 << (WordSize - (uint(i) % WordSize) - 1)
 		case b != 0:
-			panic(fmt.Errorf("vector: unexpected digit %d in position %d, " +
+			panic(fmt.Errorf("vector: unexpected digit %d in position %d, "+
 				"possible only {0, 1}", b, i))
 		}
 	}
@@ -190,18 +189,18 @@ func (v *Vector) Concatenate(u, w *Vector) *Vector {
 	if w.Len() == 0 {
 		return v.SetV(u)
 	}
-	v.body, v.lenLast = makeVector(u.Len()+w.Len())
-	for i:=0; i < len(v.body); i++ {
+	v.body, v.lenLast = makeVector(u.Len() + w.Len())
+	for i := 0; i < len(v.body); i++ {
 		if i < len(u.body) {
 			v.body[i] = u.body[i]
-			if i + 1 == len(u.body) {
+			if i+1 == len(u.body) {
 				v.body[i] ^= w.body[0] >> u.lenLast
 			}
 		} else {
 			j := i - len(u.body)
 			v.body[i] = w.body[j] << (WordSize - u.lenLast)
-			if i + 1 == len(v.body) && j+1 < len(w.body) {
-				v.body[i] ^= w.body[j + 1] >> u.lenLast
+			if i+1 == len(v.body) && j+1 < len(w.body) {
+				v.body[i] ^= w.body[j+1] >> u.lenLast
 			}
 		}
 	}
@@ -213,10 +212,13 @@ func (v *Vector) String() string {
 	var buf bytes.Buffer
 	fs := fmt.Sprintf("%%0%db", WordSize)
 	for _, w := range v.body {
-		fmt.Fprintf(&buf, fs, w)
+		_, err := fmt.Fprintf(&buf, fs, w)
+		if err != nil {
+			panic(err)
+		}
 	}
 	s := buf.String()
-	return s[:(len(s) - int(WordSize - v.lenLast))]
+	return s[:(len(s) - int(WordSize-v.lenLast))]
 }
 
 // PrettyString returns pretty formatted string of vector representation
@@ -227,10 +229,13 @@ func (v *Vector) PrettyString() string {
 	zeroSub := "-"
 	fs := fmt.Sprintf("%%0%db", WordSize)
 	for _, w := range v.body {
-		fmt.Fprint(&buf, strings.ReplaceAll(fmt.Sprintf(fs, w), "0", zeroSub))
+		_, err := fmt.Fprint(&buf, strings.ReplaceAll(fmt.Sprintf(fs, w), "0", zeroSub))
+		if err != nil {
+			panic(err)
+		}
 	}
 	s := buf.String()
-	return s[:(len(s) - int(WordSize- v.lenLast))]
+	return s[:(len(s) - int(WordSize-v.lenLast))]
 }
 
 // Cmp compares vector v and vector u and returns
@@ -251,8 +256,10 @@ func (v *Vector) Cmp(u *Vector) int {
 	}
 	for i, b := range v.body {
 		switch {
-		case b < u.body[i]: return -1
-		case b > u.body[i]: return 1
+		case b < u.body[i]:
+			return -1
+		case b > u.body[i]:
+			return 1
 		}
 	}
 	return 0
@@ -331,9 +338,33 @@ func (v *Vector) Xor(u, w *Vector) *Vector {
 	return v
 }
 
+//XorV sets v to u1 XOR u2 XOR ... XOR un and returns v
+//XorV is vectorised version of Xor function.
+func (v *Vector) XorV(u []*Vector) *Vector {
+	body := make([]word, 0)
+	var lenLast uint
+	var t uint
+	for i, w := range u {
+		if i == 0 {
+			t = w.Len()
+			body, lenLast = makeVector(t)
+		} else {
+			if w.Len() != t {
+				panic(fmt.Errorf("vector: vectors have different length: %d != %d",
+					t, w.Len()))
+			}
+		}
+		for j, b := range w.body {
+			body[j] ^= b
+		}
+	}
+	v.body, v.lenLast = body, lenLast
+	return v
+}
+
 //Or sets v to u OR w and returns v
 func (v *Vector) Or(u, w *Vector) *Vector {
-	if u==nil || w==nil {
+	if u == nil || w == nil {
 		return v
 	}
 	if u.Len() != w.Len() {
@@ -343,6 +374,30 @@ func (v *Vector) Or(u, w *Vector) *Vector {
 	body, lenLast := makeVector(u.Len())
 	for i, b := range u.body {
 		body[i] = b | w.body[i]
+	}
+	v.body, v.lenLast = body, lenLast
+	return v
+}
+
+//OrV sets v to u1 OR u2 OR ... OR un and returns v
+//OrV is vectorised version of Or function.
+func (v *Vector) OrV(u []*Vector) *Vector {
+	body := make([]word, 0)
+	var lenLast uint
+	var t uint
+	for i, w := range u {
+		if i == 0 {
+			t = w.Len()
+			body, lenLast = makeVector(t)
+		} else {
+			if w.Len() != t {
+				panic(fmt.Errorf("vector: vectors have different length: %d != %d",
+					t, w.Len()))
+			}
+		}
+		for j, b := range w.body {
+			body[j] |= b
+		}
 	}
 	v.body, v.lenLast = body, lenLast
 	return v
@@ -365,6 +420,33 @@ func (v *Vector) And(u, w *Vector) *Vector {
 	return v
 }
 
+//AndV sets v to u1 AND u2 AND ... AND un and returns v
+//AndV is vectorised version of And function.
+func (v *Vector) AndV(u []*Vector) *Vector {
+	body := make([]word, 0)
+	var lenLast uint
+	var t uint
+	for i, w := range u {
+		if i == 0 {
+			t = w.Len()
+			body, lenLast = makeVector(t)
+		} else {
+			if w.Len() != t {
+				panic(fmt.Errorf("vector: vectors have different length: %d != %d",
+					t, w.Len()))
+			}
+		}
+		for j, b := range w.body {
+			if i == 0 {
+				body[j] = MaxInteger
+			}
+			body[j] &= b
+		}
+	}
+	v.body, v.lenLast = body, lenLast
+	return v
+}
+
 //Not sets v to ^u and returns v
 func (v *Vector) Not(u *Vector) *Vector {
 	if u == nil {
@@ -373,7 +455,7 @@ func (v *Vector) Not(u *Vector) *Vector {
 	body, lenLast := makeVector(u.Len())
 	for i, b := range u.body {
 		body[i] = ^b
-		if i + 1 == len(u.body){
+		if i+1 == len(u.body) {
 			body[i] &= ((1 << lenLast) - 1) << (WordSize - lenLast)
 		}
 	}
@@ -397,10 +479,10 @@ func (v *Vector) Iter() <-chan byte {
 // That's it v = w >> r
 func (v *Vector) ShiftRight(w *Vector, r uint) *Vector {
 	body, lenLast := makeVector(w.Len())
-	start := int(r/WordSize)
+	start := int(r / WordSize)
 	l := r % WordSize
 	mask := MaxInteger >> (WordSize - l)
-	for i := int(r/WordSize); i < len(body); i++ {
+	for i := int(r / WordSize); i < len(body); i++ {
 		body[i] = w.body[i-start] >> l
 		if i > start && mask != 0 {
 			body[i] ^= (w.body[i-start-1] & mask) << (WordSize - l)
@@ -439,8 +521,8 @@ func (v *Vector) RotateLeft(w *Vector, r uint) *Vector {
 	}
 	r = r % w.Len()
 	u := new(Vector).ShiftLeft(w, r) // u == w << r
-	v.ShiftRight(w, w.Len() - r) // v == w >> (len - r)
-	return v.Xor(v,u)
+	v.ShiftRight(w, w.Len()-r)       // v == w >> (len - r)
+	return v.Xor(v, u)
 }
 
 //RotateRight cyclical shifts vector w for r position right and sets vector v to shifted w, returns v
@@ -451,7 +533,7 @@ func (v *Vector) RotateRight(w *Vector, r uint) *Vector {
 		return v
 	}
 	r = r % w.Len()
-	u := new(Vector).ShiftLeft(w, w.Len() - r)  // u == w << (len - r)
-	v.ShiftRight(w, r)  // v == w >> r
+	u := new(Vector).ShiftLeft(w, w.Len()-r) // u == w << (len - r)
+	v.ShiftRight(w, r)                       // v == w >> r
 	return v.Xor(v, u)
 }
