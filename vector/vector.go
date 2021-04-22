@@ -238,6 +238,13 @@ func (v *Vector) PrettyString() string {
 	return s[:(len(s) - int(WordSize-v.lenLast))]
 }
 
+// LateXString returns string of vector representation to use in LaTeX matrix environment
+// Example:
+// 0101011 -> 0&1&0&1&0&1&1
+func (v *Vector) LateXString() string {
+	return strings.Join(strings.Split(v.String(), ""), "&")
+}
+
 // Cmp compares vector v and vector u and returns
 // -1 if v < u
 //  0 if v == u
