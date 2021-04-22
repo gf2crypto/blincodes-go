@@ -148,7 +148,7 @@ func TestVector_PrettyString(t *testing.T) {
 	}
 }
 
-func TestVector_LateXString(t *testing.T) {
+func TestVector_LaTeXString(t *testing.T) {
 	var testCases = [][]interface{}{
 		{[]byte{}, ""},
 		{[]byte{0}, "0"},
@@ -179,8 +179,8 @@ func TestVector_LateXString(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		v := new(Vector).SetBitArray(tc[0].([]byte))
-		if v.LateXString() != tc[1].(string) {
-			t.Errorf("v.LaTeXString(%v) == %s, expected %s", tc[0], v.LateXString(), tc[1])
+		if v.LaTeXString() != tc[1].(string) {
+			t.Errorf("v.LaTeXString(%v) == %s, expected %s", tc[0], v.LaTeXString(), tc[1])
 		}
 	}
 }
