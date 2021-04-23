@@ -26,30 +26,55 @@ func New() *Vector {
 	return &Vector{body: nil, lenLast: WordSize}
 }
 
-//makeVector allocates memory for vector of length n
-func makeVector(n uint) ([]word, uint) {
-	if n == 0 {
-		return nil, WordSize
+//reAllocate reallocates memory for vector, n is new length of vector, returns m
+func (v *Vector) reAllocate(n uint) *Vector {
+	var lenBlock uint
+	lenBlock, v.lenLast = getShapes(n)
+	switch {
+	case lenBlock == 0:
+		v.body = nil
+	case cap(v.body) < int(lenBlock):
+		v.body = make([]word, lenBlock)
+	default:
+		v.body = v.body[:lenBlock]
 	}
+	return v
+}
+
+//allocate reallocates memory for vector, n is new length of vector, returns m
+func (v *Vector) allocate(n uint) *Vector {
+	var lenBlock uint
+	lenBlock, v.lenLast = getShapes(n)
+	switch {
+	case lenBlock == 0:
+		v.body = nil
+	default:
+		v.body = make([]word, lenBlock)
+	}
+	return v
+}
+
+//getShapes calculates the shapes of vector by the length.
+//It returns length of vector's body and length of the vector's last block
+func getShapes(n uint) (uint, uint) {
 	lenBlock := n / WordSize
 	lenLast := n % WordSize
-	if lenLast != 0 {
+	if lenLast != 0 && n != 0 {
 		lenBlock++
 	} else {
 		lenLast = WordSize
 	}
-	return make([]word, lenBlock), lenLast
+	return lenBlock, lenLast
 }
 
 //SetZero sets v to a units vector of length n, returns v
 func (v *Vector) SetZero(n uint) *Vector {
-	v.body, v.lenLast = makeVector(n)
-	return v
+	return v.allocate(n)
 }
 
 //SetV sets v to u, returns v
 func (v *Vector) SetV(u *Vector) *Vector {
-	v.body, v.lenLast = makeVector(u.Len())
+	v.reAllocate(u.Len())
 	for i := 0; i < len(v.body); i++ {
 		v.body[i] = u.body[i]
 	}
@@ -66,9 +91,9 @@ func (v *Vector) Len() uint {
 
 //SetUnits sets v to a units vector of length n
 func (v *Vector) SetUnits(n uint) *Vector {
-	v.body, v.lenLast = makeVector(n)
+	v.reAllocate(n)
 	for i := 0; i < len(v.body); i++ {
-		v.body[i] = ^v.body[i]
+		v.body[i] = ^word(0)
 		if i+1 == len(v.body) {
 			v.body[i] &= ((1 << v.lenLast) - 1) << (WordSize - v.lenLast)
 		}
@@ -88,11 +113,12 @@ func (v *Vector) SetBytes(b []byte, n uint) *Vector {
 		nBytes += 1
 	}
 	r := WordSize / 8
-	v.body, v.lenLast = makeVector(n)
+	v.reAllocate(n)
 	for i := uint(0); i < uint(len(v.body)); i++ {
 		if r*i >= uint(len(b)) {
 			break
 		}
+		v.body[i] = 0
 		for j := uint(0); j < r; j++ {
 			v.body[i] <<= 8
 			if r*i+j < uint(len(b)) {
@@ -132,8 +158,8 @@ func (v *Vector) Parse(s string) (*Vector, error) {
 		v.lenLast = WordSize
 		return v, nil
 	}
-	body, lenLast := makeVector(uint(len(s)))
-	for i, j := uint(0), 0; j < len(body); j++ {
+	w := New().allocate(uint(len(s)))
+	for i, j := uint(0), 0; j < len(w.body); j++ {
 		max := i + WordSize
 		if max > uint(len(s)) {
 			max = uint(len(s))
@@ -142,27 +168,26 @@ func (v *Vector) Parse(s string) (*Vector, error) {
 		if err != nil {
 			return v, err
 		}
-		body[j] = word(t)
+		w.body[j] = word(t)
 		i = max
 	}
-	body[len(body)-1] <<= WordSize - lenLast
-	v.body, v.lenLast = body, lenLast
+	w.body[len(w.body)-1] <<= WordSize - w.lenLast
+	v.body, v.lenLast = w.body, w.lenLast
 	return v, nil
 }
 
 //SetBitArray converts bit array to Vector and sets v to the result
 func (v *Vector) SetBitArray(array []byte) *Vector {
-	body, lenLast := makeVector(uint(len(array)))
+	v.reAllocate(uint(len(array)))
 	for i, b := range array {
 		switch {
 		case b == 1:
-			body[i/int(WordSize)] ^= 1 << (WordSize - (uint(i) % WordSize) - 1)
+			v.body[i/int(WordSize)] ^= 1 << (WordSize - (uint(i) % WordSize) - 1)
 		case b != 0:
 			panic(fmt.Errorf("vector: unexpected digit %d in position %d, "+
 				"possible only {0, 1}", b, i))
 		}
 	}
-	v.body, v.lenLast = body, lenLast
 	return v
 }
 
@@ -170,7 +195,7 @@ func (v *Vector) SetBitArray(array []byte) *Vector {
 // Example:
 //     v.SetSupport(10, []int{0, 1, 5, 9}) -> 1100010001
 func (v *Vector) SetSupport(n uint, sup []uint) *Vector {
-	v.body, v.lenLast = makeVector(n)
+	v.SetZero(n)
 	for _, i := range sup {
 		if i >= n {
 			continue
@@ -189,21 +214,22 @@ func (v *Vector) Concatenate(u, w *Vector) *Vector {
 	if w.Len() == 0 {
 		return v.SetV(u)
 	}
-	v.body, v.lenLast = makeVector(u.Len() + w.Len())
-	for i := 0; i < len(v.body); i++ {
+	tmpv := New().allocate(u.Len() + w.Len())
+	for i := 0; i < len(tmpv.body); i++ {
 		if i < len(u.body) {
-			v.body[i] = u.body[i]
+			tmpv.body[i] = u.body[i]
 			if i+1 == len(u.body) {
-				v.body[i] ^= w.body[0] >> u.lenLast
+				tmpv.body[i] ^= w.body[0] >> u.lenLast
 			}
 		} else {
 			j := i - len(u.body)
-			v.body[i] = w.body[j] << (WordSize - u.lenLast)
-			if i+1 == len(v.body) && j+1 < len(w.body) {
-				v.body[i] ^= w.body[j+1] >> u.lenLast
+			tmpv.body[i] = w.body[j] << (WordSize - u.lenLast)
+			if i+1 == len(tmpv.body) && j+1 < len(w.body) {
+				tmpv.body[i] ^= w.body[j+1] >> u.lenLast
 			}
 		}
 	}
+	v.body, v.lenLast = tmpv.body, tmpv.lenLast
 	return v
 }
 
@@ -337,37 +363,36 @@ func (v *Vector) Xor(u, w *Vector) *Vector {
 		panic(fmt.Errorf("vector: vectors have different length: %d != %d",
 			u.Len(), w.Len()))
 	}
-	body, lenLast := makeVector(u.Len())
+	v.reAllocate(u.Len())
 	for i, b := range u.body {
-		body[i] = b ^ w.body[i]
+		v.body[i] = b ^ w.body[i]
 	}
-	v.body, v.lenLast = body, lenLast
 	return v
 }
 
-//XorV sets v to u1 XOR u2 XOR ... XOR un and returns v
-//XorV is vectorised version of Xor function.
-func (v *Vector) XorV(u []*Vector) *Vector {
-	body := make([]word, 0)
-	var lenLast uint
-	var t uint
-	for i, w := range u {
-		if i == 0 {
-			t = w.Len()
-			body, lenLast = makeVector(t)
-		} else {
-			if w.Len() != t {
-				panic(fmt.Errorf("vector: vectors have different length: %d != %d",
-					t, w.Len()))
-			}
-		}
-		for j, b := range w.body {
-			body[j] ^= b
-		}
-	}
-	v.body, v.lenLast = body, lenLast
-	return v
-}
+////XorV sets v to u1 XOR u2 XOR ... XOR un and returns v
+////XorV is vectorised version of Xor function.
+//func (v *Vector) XorV(u []*Vector) *Vector {
+//	body := make([]word, 0)
+//	var lenLast uint
+//	var t uint
+//	for i, w := range u {
+//		if i == 0 {
+//			t = w.Len()
+//			body, lenLast = makeVector(t)
+//		} else {
+//			if w.Len() != t {
+//				panic(fmt.Errorf("vector: vectors have different length: %d != %d",
+//					t, w.Len()))
+//			}
+//		}
+//		for j, b := range w.body {
+//			body[j] ^= b
+//		}
+//	}
+//	v.body, v.lenLast = body, lenLast
+//	return v
+//}
 
 //Or sets v to u OR w and returns v
 func (v *Vector) Or(u, w *Vector) *Vector {
@@ -378,37 +403,36 @@ func (v *Vector) Or(u, w *Vector) *Vector {
 		panic(fmt.Errorf("vector: vectors have different length: %d != %d",
 			u.Len(), w.Len()))
 	}
-	body, lenLast := makeVector(u.Len())
+	v.reAllocate(u.Len())
 	for i, b := range u.body {
-		body[i] = b | w.body[i]
+		v.body[i] = b | w.body[i]
 	}
-	v.body, v.lenLast = body, lenLast
 	return v
 }
 
-//OrV sets v to u1 OR u2 OR ... OR un and returns v
-//OrV is vectorised version of Or function.
-func (v *Vector) OrV(u []*Vector) *Vector {
-	body := make([]word, 0)
-	var lenLast uint
-	var t uint
-	for i, w := range u {
-		if i == 0 {
-			t = w.Len()
-			body, lenLast = makeVector(t)
-		} else {
-			if w.Len() != t {
-				panic(fmt.Errorf("vector: vectors have different length: %d != %d",
-					t, w.Len()))
-			}
-		}
-		for j, b := range w.body {
-			body[j] |= b
-		}
-	}
-	v.body, v.lenLast = body, lenLast
-	return v
-}
+////OrV sets v to u1 OR u2 OR ... OR un and returns v
+////OrV is vectorised version of Or function.
+//func (v *Vector) OrV(u []*Vector) *Vector {
+//	body := make([]word, 0)
+//	var lenLast uint
+//	var t uint
+//	for i, w := range u {
+//		if i == 0 {
+//			t = w.Len()
+//			body, lenLast = makeVector(t)
+//		} else {
+//			if w.Len() != t {
+//				panic(fmt.Errorf("vector: vectors have different length: %d != %d",
+//					t, w.Len()))
+//			}
+//		}
+//		for j, b := range w.body {
+//			body[j] |= b
+//		}
+//	}
+//	v.body, v.lenLast = body, lenLast
+//	return v
+//}
 
 //And sets v to u AND w and returns v
 func (v *Vector) And(u, w *Vector) *Vector {
@@ -419,54 +443,52 @@ func (v *Vector) And(u, w *Vector) *Vector {
 		panic(fmt.Errorf("vector: vectors have different length: %d != %d",
 			u.Len(), w.Len()))
 	}
-	body, lenLast := makeVector(u.Len())
+	v.reAllocate(u.Len())
 	for i, b := range u.body {
-		body[i] = b & w.body[i]
+		v.body[i] = b & w.body[i]
 	}
-	v.body, v.lenLast = body, lenLast
 	return v
 }
 
-//AndV sets v to u1 AND u2 AND ... AND un and returns v
-//AndV is vectorised version of And function.
-func (v *Vector) AndV(u []*Vector) *Vector {
-	body := make([]word, 0)
-	var lenLast uint
-	var t uint
-	for i, w := range u {
-		if i == 0 {
-			t = w.Len()
-			body, lenLast = makeVector(t)
-		} else {
-			if w.Len() != t {
-				panic(fmt.Errorf("vector: vectors have different length: %d != %d",
-					t, w.Len()))
-			}
-		}
-		for j, b := range w.body {
-			if i == 0 {
-				body[j] = MaxInteger
-			}
-			body[j] &= b
-		}
-	}
-	v.body, v.lenLast = body, lenLast
-	return v
-}
+////AndV sets v to u1 AND u2 AND ... AND un and returns v
+////AndV is vectorised version of And function.
+//func (v *Vector) AndV(u []*Vector) *Vector {
+//	body := make([]word, 0)
+//	var lenLast uint
+//	var t uint
+//	for i, w := range u {
+//		if i == 0 {
+//			t = w.Len()
+//			body, lenLast = makeVector(t)
+//		} else {
+//			if w.Len() != t {
+//				panic(fmt.Errorf("vector: vectors have different length: %d != %d",
+//					t, w.Len()))
+//			}
+//		}
+//		for j, b := range w.body {
+//			if i == 0 {
+//				body[j] = MaxInteger
+//			}
+//			body[j] &= b
+//		}
+//	}
+//	v.body, v.lenLast = body, lenLast
+//	return v
+//}
 
 //Not sets v to ^u and returns v
 func (v *Vector) Not(u *Vector) *Vector {
 	if u == nil {
 		return v
 	}
-	body, lenLast := makeVector(u.Len())
+	v.reAllocate(u.Len())
 	for i, b := range u.body {
-		body[i] = ^b
+		v.body[i] = ^b
 		if i+1 == len(u.body) {
-			body[i] &= ((1 << lenLast) - 1) << (WordSize - lenLast)
+			v.body[i] &= ((1 << v.lenLast) - 1) << (WordSize - v.lenLast)
 		}
 	}
-	v.body, v.lenLast = body, lenLast
 	return v
 }
 
@@ -485,37 +507,39 @@ func (v *Vector) Iter() <-chan byte {
 //ShiftRight shifts vector w for r position right and sets vector v to shifted w, returns v
 // That's it v = w >> r
 func (v *Vector) ShiftRight(w *Vector, r uint) *Vector {
-	body, lenLast := makeVector(w.Len())
+	//body, lenLast := makeVector(w.Len())
 	start := int(r / WordSize)
 	l := r % WordSize
 	mask := MaxInteger >> (WordSize - l)
-	for i := int(r / WordSize); i < len(body); i++ {
-		body[i] = w.body[i-start] >> l
+	tmpv := New().allocate(w.Len())
+	for i := start; i < len(w.body); i++ {
+		tmpv.body[i] = w.body[i-start] >> l
 		if i > start && mask != 0 {
-			body[i] ^= (w.body[i-start-1] & mask) << (WordSize - l)
+			tmpv.body[i] ^= (w.body[i-start-1] & mask) << (WordSize - l)
 		}
-		if i == len(body)-1 {
-			body[i] &= MaxInteger << (WordSize - lenLast)
+		if i == len(tmpv.body)-1 {
+			tmpv.body[i] &= MaxInteger << (WordSize - tmpv.lenLast)
 		}
 	}
-	v.body, v.lenLast = body, lenLast
+	v.body, v.lenLast = tmpv.body, tmpv.lenLast
 	return v
 }
 
 //ShiftLeft shifts vector w for r position left and sets vector v to shifted w, returns v
 // That's it v = w << r
 func (v *Vector) ShiftLeft(w *Vector, r uint) *Vector {
-	body, lenLast := makeVector(w.Len())
+	//body, lenLast := makeVector(w.Len())
 	start := int(r / WordSize)
 	l := r % WordSize
 	mask := MaxInteger << (WordSize - l)
-	for i := start; i < len(body); i++ {
-		body[i-start] = w.body[i] << l
-		if i < len(body)-1 {
-			body[i-start] ^= (w.body[i+1] & mask) >> (WordSize - l)
+	tmpv := New().allocate(w.Len())
+	for i := start; i < len(w.body); i++ {
+		tmpv.body[i-start] = w.body[i] << l
+		if i < len(w.body)-1 {
+			tmpv.body[i-start] ^= (w.body[i+1] & mask) >> (WordSize - l)
 		}
 	}
-	v.body, v.lenLast = body, lenLast
+	v.body, v.lenLast = tmpv.body, tmpv.lenLast
 	return v
 }
 
@@ -523,7 +547,7 @@ func (v *Vector) ShiftLeft(w *Vector, r uint) *Vector {
 // That's it v = w rotl r
 func (v *Vector) RotateLeft(w *Vector, r uint) *Vector {
 	if w.Len() == 0 {
-		v.body, v.lenLast = makeVector(0)
+		v.allocate(0)
 		return v
 	}
 	r = r % w.Len()
@@ -536,7 +560,7 @@ func (v *Vector) RotateLeft(w *Vector, r uint) *Vector {
 // That's it v = w rotr r
 func (v *Vector) RotateRight(w *Vector, r uint) *Vector {
 	if w.Len() == 0 {
-		v.body, v.lenLast = makeVector(0)
+		v.allocate(0)
 		return v
 	}
 	r = r % w.Len()
