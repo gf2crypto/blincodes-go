@@ -41,7 +41,7 @@ func (v *Vector) reAllocate(n uint) *Vector {
 	return v
 }
 
-//allocate reallocates memory for vector, n is new length of vector, returns m
+//allocate reallocates memory for vector, n is new length of vector, returns v
 func (v *Vector) allocate(n uint) *Vector {
 	var lenBlock uint
 	lenBlock, v.lenLast = getShapes(n)
@@ -74,10 +74,11 @@ func (v *Vector) SetZero(n uint) *Vector {
 
 //SetV sets v to u, returns v
 func (v *Vector) SetV(u *Vector) *Vector {
-	v.reAllocate(u.Len())
-	for i := 0; i < len(v.body); i++ {
-		v.body[i] = u.body[i]
+	if u == v {
+		return v
 	}
+	v.reAllocate(u.Len())
+	copy(v.body, u.body)
 	return v
 }
 
@@ -201,7 +202,7 @@ func (v *Vector) SetSupport(n uint, sup []uint) *Vector {
 			continue
 		}
 		// 0 <= index <= n - 1
-		v.body[i/WordSize] ^= 1 << (WordSize - (uint(i) % WordSize) - 1)
+		v.body[i/WordSize] ^= 1 << (WordSize - (i % WordSize) - 1)
 	}
 	return v
 }
@@ -215,21 +216,35 @@ func (v *Vector) Concatenate(u, w *Vector) *Vector {
 		return v.SetV(u)
 	}
 	tmpv := New().allocate(u.Len() + w.Len())
-	for i := 0; i < len(tmpv.body); i++ {
-		if i < len(u.body) {
-			tmpv.body[i] = u.body[i]
-			if i+1 == len(u.body) {
-				tmpv.body[i] ^= w.body[0] >> u.lenLast
-			}
-		} else {
+	copy(tmpv.body, u.body)
+	tmpv.body[len(u.body) - 1] ^= w.body[0] >> u.lenLast
+	for i := len(u.body); i < len(tmpv.body); i++ {
 			j := i - len(u.body)
 			tmpv.body[i] = w.body[j] << (WordSize - u.lenLast)
-			if i+1 == len(tmpv.body) && j+1 < len(w.body) {
+			if j+1 < len(w.body) {
 				tmpv.body[i] ^= w.body[j+1] >> u.lenLast
 			}
-		}
 	}
 	v.body, v.lenLast = tmpv.body, tmpv.lenLast
+	return v
+}
+
+//Resize resizes vector w and sets the result to v, returns v
+func (v *Vector) Resize(w *Vector, r int) *Vector {
+	newLen := uint(0)
+	v.SetV(w)
+	if r < 0 {
+		if v.Len() <= uint(-r) {
+			return v.SetZero(0)
+		}
+		newLen = v.Len() - uint(-r)
+ 	} else {
+ 		newLen = v.Len() + uint(r)
+	}
+	u := new(Vector).reAllocate(newLen)
+	copy(u.body, w.body)
+	v.body, v.lenLast = u.body, u.lenLast
+	v.body[len(v.body) - 1] &= ^word(0) << (WordSize - v.lenLast)
 	return v
 }
 
@@ -311,6 +326,19 @@ func (v *Vector) Get(i uint) byte {
 		return 0
 	}
 	return 1
+}
+
+// SetBit sets v to vector w with change coordinate i by bit b % 2
+// m = w[i] <- b%2
+func (v *Vector) SetBit(w *Vector, i uint, b byte) *Vector {
+    v.SetV(w)
+    n := i / WordSize
+    if b % 2 == 0 {
+		v.body[n] &= ^word(0) ^ (1 << (WordSize-i%WordSize-1))
+	} else {
+		v.body[n] |= 1 << (WordSize-i % WordSize-1)
+	}
+	return v
 }
 
 // Bits returns all bits of vector as slice of bytes
