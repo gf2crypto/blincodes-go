@@ -947,7 +947,7 @@ func TestVector_Wt(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		w := tc[0].(*Vector).Wt()
-		if w != tc[1].(int) {
+		if w != tc[1].(uint) {
 			t.Errorf("%s.Wt() == %v, expected %d", tc[0], w, tc[1])
 		}
 	}

@@ -217,13 +217,13 @@ func (v *Vector) Concatenate(u, w *Vector) *Vector {
 	}
 	tmpv := New().allocate(u.Len() + w.Len())
 	copy(tmpv.body, u.body)
-	tmpv.body[len(u.body) - 1] ^= w.body[0] >> u.lenLast
+	tmpv.body[len(u.body)-1] ^= w.body[0] >> u.lenLast
 	for i := len(u.body); i < len(tmpv.body); i++ {
-			j := i - len(u.body)
-			tmpv.body[i] = w.body[j] << (WordSize - u.lenLast)
-			if j+1 < len(w.body) {
-				tmpv.body[i] ^= w.body[j+1] >> u.lenLast
-			}
+		j := i - len(u.body)
+		tmpv.body[i] = w.body[j] << (WordSize - u.lenLast)
+		if j+1 < len(w.body) {
+			tmpv.body[i] ^= w.body[j+1] >> u.lenLast
+		}
 	}
 	v.body, v.lenLast = tmpv.body, tmpv.lenLast
 	return v
@@ -238,13 +238,13 @@ func (v *Vector) Resize(w *Vector, r int) *Vector {
 			return v.SetZero(0)
 		}
 		newLen = v.Len() - uint(-r)
- 	} else {
- 		newLen = v.Len() + uint(r)
+	} else {
+		newLen = v.Len() + uint(r)
 	}
 	u := new(Vector).reAllocate(newLen)
 	copy(u.body, w.body)
 	v.body, v.lenLast = u.body, u.lenLast
-	v.body[len(v.body) - 1] &= ^word(0) << (WordSize - v.lenLast)
+	v.body[len(v.body)-1] &= ^word(0) << (WordSize - v.lenLast)
 	return v
 }
 
@@ -331,12 +331,12 @@ func (v *Vector) Get(i uint) byte {
 // SetBit sets v to vector w with change coordinate i by bit b % 2
 // m = w[i] <- b%2
 func (v *Vector) SetBit(w *Vector, i uint, b byte) *Vector {
-    v.SetV(w)
-    n := i / WordSize
-    if b % 2 == 0 {
-		v.body[n] &= ^word(0) ^ (1 << (WordSize-i%WordSize-1))
+	v.SetV(w)
+	n := i / WordSize
+	if b%2 == 0 {
+		v.body[n] &= ^word(0) ^ (1 << (WordSize - i%WordSize - 1))
 	} else {
-		v.body[n] |= 1 << (WordSize-i % WordSize-1)
+		v.body[n] |= 1 << (WordSize - i%WordSize - 1)
 	}
 	return v
 }
@@ -351,10 +351,10 @@ func (v *Vector) Bits() []byte {
 }
 
 //Wt returns Hamming weight of vector
-func (v *Vector) Wt() int {
-	wt := 0
+func (v *Vector) Wt() uint {
+	wt := uint(0)
 	for i := uint(0); i < v.Len(); i++ {
-		wt += int(v.Get(i))
+		wt += uint(v.Get(i))
 	}
 	return wt
 }
