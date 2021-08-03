@@ -1,89 +1,178 @@
 package rm
 
-// import "fmt"
-import "testing"
-import "github.com/gf2crypto/blincodes-go/matrix"
+import (
+	"fmt"
+	"github.com/gf2crypto/blincodes-go/lincode"
+	"github.com/gf2crypto/blincodes-go/vector"
+	"testing"
+)
 
-//TestRMGenerator00 test the evaluation of the generator matrix of RM(0, 0) code
-func TestRMGenerator00(t *testing.T) {
-    rm := New(0, 0)
-    if rm.N() != 1 {
-        t.Errorf("expected rm.N == 1, but rm.N=%v", rm.N())
-    }
-    if rm.K() != 1 {
-        t.Errorf("expected rm.K == 1, but rm.K=%v", rm.K())
-    }
-    if g := rm.Gen(); !g.Equal(matrix.New(1, []uint8{1})) {
-        t.Errorf("expected rm.G == [1], but rm.G=%v", g)
-    }
-    if h := rm.ParityCheck(); !h.Equal(matrix.New(1)) {
-        t.Errorf("expected rm.H == [0], but rm.H=%v", h)
-    }
+func TestGeneration(t *testing.T) {
+	tests := []struct {
+		r, m uint
+		want struct {
+			n, k, d uint
+			basis   []*vector.Vector
+		}
+	}{
+		{0, 0, struct {
+			n, k, d uint
+			basis   []*vector.Vector
+		}{1, 1, 1, []*vector.Vector{new(vector.Vector).SetUnits(1)}}},
+		{2, 0, struct {
+			n, k, d uint
+			basis   []*vector.Vector
+		}{1, 1, 1, []*vector.Vector{new(vector.Vector).SetUnits(1)}}},
+		{0, 4, struct {
+			n, k, d uint
+			basis   []*vector.Vector
+		}{16, 1, 16, []*vector.Vector{new(vector.Vector).SetUnits(16)}}},
+		{1, 4, struct {
+			n, k, d uint
+			basis   []*vector.Vector
+		}{16, 5, 8, []*vector.Vector{new(vector.Vector).SetBitArray([]byte{
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+		})}}},
+		{2, 4, struct {
+			n, k, d uint
+			basis   []*vector.Vector
+		}{16, 11, 4, []*vector.Vector{new(vector.Vector).SetBitArray([]byte{
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1,
+		}), new(vector.Vector).SetBitArray([]byte{
+			0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1,
+		}),
+		}}},
+	}
+	cmpArray := func(a, b []*vector.Vector) bool {
+		if len(a) != len(b) {
+			return false
+		}
+		for i, v := range a {
+			if v.Cmp(b[i]) != 0 {
+				fmt.Println(v, b[i])
+				return false
+			}
+		}
+		return true
+	}
+	vToStr := func(v []*vector.Vector) string {
+		s := "[\n"
+		for _, w := range v {
+			s += fmt.Sprintf("    [ %s ],\n", w)
+		}
+		s += "]"
+		return s
+	}
+	for _, test := range tests {
+		c := new(Code).Set(test.r, test.m)
+		if n := c.N(); n != test.want.n {
+			msg := "RM(%d, %d).N() = %d, want %d"
+			t.Errorf(msg, test.r, test.m, n, test.want.n)
+		}
+		if k := c.K(); k != test.want.k {
+			msg := "RM(%d, %d).K() = %d, want %d"
+			t.Errorf(msg, test.r, test.m, k, test.want.k)
+		}
+		if d := c.D(); d != test.want.d {
+			msg := "RM(%d, %d).N() = %d, want %d"
+			t.Errorf(msg, test.r, test.m, d, test.want.d)
+		}
+		if basis := c.GetBasis(); !cmpArray(basis, test.want.basis) {
+			msg := "RM(%d, %d).GetBasis() = \n%v,\nwant\n%v"
+			t.Errorf(msg, test.r, test.m, vToStr(basis), vToStr(test.want.basis))
+		}
+	}
 }
 
-//TestRMGenerator04 test the evaluation of the generator matrix of RM(0, 4) code
-func TestRMGenerator04(t *testing.T) {
-    rm := New(0, 4)
-    if rm.N() != 16 {
-        t.Errorf("expected rm.N == 16, but rm.N=%v", rm.N())
-    }
-    if rm.K() != 1 {
-        t.Errorf("expected rm.K == 1, but rm.K=%v", rm.K())
-    }
-    gen := matrix.New(1, []uint8{
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    })
-    if g := rm.Gen(); !g.Equal(gen) {
-        t.Errorf("expected rm.G == %v, but rm.G=%v", gen, g)
-    }
-    if h := rm.ParityCheck(); !gen.Mul(h.T()).Equal(matrix.New(1, 15)) {
-        t.Errorf("expected rm.G*(rm.H)^T == 0, rm.H==\n%v", h)
-    }
+func TestDuality(t *testing.T) {
+	tests := []struct {
+		r, m uint
+		want lincode.LinearCode
+	}{
+		{1, 2, new(Code).Set(0, 2)},
+		{1, 4, new(Code).Set(2, 4)},
+		{2, 5, new(Code).Set(2, 5)},
+		{2, 7, new(Code).Set(4, 7)},
+		{3, 8, new(Code).Set(4, 8)},
+		{3, 9, new(Code).Set(5, 9)},
+		{3, 10, new(Code).Set(6, 10)},
+		{4, 11, new(Code).Set(6, 11)},
+		{5, 5, new(lincode.GenericLinCode).SetZero(32)},
+		{9, 10, new(Code).Set(0, 10)},
+	}
+	for _, test := range tests {
+		dual := lincode.Dual(new(Code).Set(test.r, test.m))
+		if !lincode.IsEqual(dual, test.want) {
+			msg := "Dual(RM(%d, %d)) =\n%s,\nwant\n%s"
+			t.Errorf(msg, test.r, test.m, dual, lincode.String(test.want))
+		}
+	}
 }
 
-//TestRMGenerator14 test the evaluation of the generator matrix of RM(1, 4) code
-func TestRMGenerator14(t *testing.T) {
-    rm := New(1, 4)
-    if rm.N() != 16 {
-        t.Errorf("expected rm.N == 16, but rm.N=%v", rm.N())
-    }
-    if rm.K() != 5 {
-        t.Errorf("expected rm.K == 5, but rm.K=%v", rm.K())
-    }
-    gen := matrix.New(5, []uint8{
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
-        0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
-        0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
-    })
-    if g := rm.Gen(); !g.Equal(gen) {
-        t.Errorf("expected rm.G == %v, but rm.G=\n%v", gen, g)
-    }
-    if h := rm.ParityCheck(); !h.Equal(New(2, 4).Gen()) {
-        t.Errorf("expected rm.H == rm.G(2,4), rm.H==\n%v", h)
-    }
-    if h := rm.ParityCheck(); !rm.Gen().Mul(h.T()).Equal(matrix.New(5, 11)) {
-        t.Errorf("expected rm.G*(rm.H)^T == 0, rm.H==\n%v", h)
-    }
-}
-
-//TestRMGenerator test the evaluation of the generator matrix of RM code
-func TestRMGenerator(t *testing.T) {
-    if g, h := New(3, 8).Gen(), New(4, 8).Gen(); !g.Mul(h.T()).Equal(matrix.New(g.Nrows(), h.Nrows())) {
-        t.Errorf("expected rm.G(3, 8)*(rm.G(4, 8))^T == 0, rm.G(3,8)==\n%v\nrm.G(4,8)==\n%v", g, h)
-    }
-    if g, h := New(3, 8).ParityCheck(), New(4, 8).ParityCheck(); !g.Mul(h.T()).Equal(matrix.New(g.Nrows(), h.Nrows())) {
-        t.Errorf("expected rm.H(3, 8)*(rm.H(4, 8))^T == 0, rm.H(3,8)==\n%v\nrm.H(4,8)==\n%v", g, h)
-    }
-}
-
-//TestRMGenerator310 test the evaluation of the generator matrix of RM(3, 10) code
-func TestRMGenerator310(t *testing.T) {
-    if g, h := New(3, 10).Gen(), New(6, 10).Gen(); !g.Mul(h.T()).Equal(matrix.New(g.Nrows(), h.Nrows())) {
-        t.Errorf("expected rm.G(3, 10)*(rm.G(6, 10))^T == 0, rm.G(3,10)==\n%v\nrm.G(6,10)==\n%v", g, h)
-    }
-    if g, h := New(3, 10).ParityCheck(), New(6, 10).ParityCheck(); !g.Mul(h.T()).Equal(matrix.New(g.Nrows(), h.Nrows())) {
-        t.Errorf("expected rm.H(3, 10)*(rm.H(6, 10))^T == 0, rm.H(3,10)==\n%v\nrm.H(6,10)==\n%v", g, h)
-    }
+func TestHadamardProduct(t *testing.T) {
+	tests := []struct {
+		code1 struct {
+			r, m uint
+		}
+		code2 struct {
+			r, m uint
+		}
+		want lincode.LinearCode
+	}{
+		{struct {
+			r, m uint
+		}{1, 4}, struct {
+			r, m uint
+		}{2, 4}, new(Code).Set(3, 4)},
+		{struct {
+			r, m uint
+		}{3, 8}, struct {
+			r, m uint
+		}{3, 8}, new(Code).Set(6, 8)},
+		{struct {
+			r, m uint
+		}{3, 10}, struct {
+			r, m uint
+		}{2, 10}, new(Code).Set(5, 10)},
+		{struct {
+			r, m uint
+		}{4, 10}, struct {
+			r, m uint
+		}{4, 10}, new(Code).Set(8, 10)},
+	}
+	for _, test := range tests {
+		hp := lincode.HadamardProduct(new(Code).Set(test.code1.r, test.code1.m),
+			new(Code).Set(test.code2.r, test.code2.m))
+		if !lincode.IsEqual(hp, test.want) {
+			msg := "RM(%d, %d) o RM(%d, %d) =\n%s,\nwant\n%s"
+			t.Errorf(msg, test.code1.r, test.code1.m,
+				test.code2.r, test.code2.m, hp, lincode.String(test.want))
+		}
+	}
 }
